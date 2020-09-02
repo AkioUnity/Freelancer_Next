@@ -1,0 +1,25 @@
+
+POST https://ineedadeveloper.com/api/v1/listing/add-jobs
+Content-Type: application/json
+
+{
+  "user_id":26,
+  "title": "title",
+  "project_level": "medium",
+  "project_duration": "weekly",
+  "english_level": "fluent",
+  "project_cost": 500,
+  "description": "Project description"
+}
+
+### Get request with a header
+GET https://ineedadeveloper.com/api/v1/listing/add-jobs
+Accept: application/json
+###
+
+POST https://ineedadeveloper.com/api/v1/listing/add-jobs
+Content-Type: application/x-www-form-urlencoded
+
+id=999&value=content
+
+###
