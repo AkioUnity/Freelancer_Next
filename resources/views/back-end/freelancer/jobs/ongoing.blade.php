@@ -49,7 +49,7 @@
                                                     @if (!empty($job->project_type))
                                                         <li><a href="javascript:void(0);" class="wt-clicksavefolder"><img class="wt-job-icon" src="{{asset('images/job-icons/job-type.png')}}"> {{ trans('lang.type') }} {{{ $project_type }}}</a></li>
                                                     @endif
-                                                    @if (!empty($job->duration))
+                                                    @if (!empty($job->duration) && !is_array($duration))
                                                         <li><span class="wt-dashboradclock"><img class="wt-job-icon" src="{{asset('images/job-icons/job-duration.png')}}"> {{ trans('lang.duration') }} {{{ $duration }}}</span></li>
                                                     @endif
                                                 </ul>

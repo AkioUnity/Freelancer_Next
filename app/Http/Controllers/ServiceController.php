@@ -171,60 +171,102 @@ class ServiceController extends Controller
             $json['message'] = trans('lang.service_warning');
             return $json;
         }
-        $this->validate(
-            $request,
-            [
-                'title' => 'required',
-                'delivery_time'    => 'required',
-                'service_price'    => 'required',
-                'response_time'    => 'required',
-                'english_level'    => 'required',
-                'description'    => 'required',
-            ]
-        );
-        if (!empty($request['latitude']) || !empty($request['longitude'])) {
+        if (Auth::user()->user_verified == 1) {
             $this->validate(
                 $request,
                 [
-                    'latitude' => ['regex:/^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}$/'],
-                    'longitude' => ['regex:/^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,6}$/'],
+                    'title' => 'required',
+                    'delivery_time'    => 'required',
+                    'service_price'    => 'required',
+                    'response_time'    => 'required',
+                    'english_level'    => 'required',
+                    'description'    => 'required',
                 ]
             );
-        }
-        $user = User::find(Auth::user()->id);
-        $package_item = Item::where('subscriber', Auth::user()->id)->first();
-        $package = !empty($package_item) ? Package::find($package_item->product_id) : '';
-        $option = !empty($package) ? unserialize($package->options) : '';
-        $expiry = !empty($option) ? $package_item->created_at->addDays($option['duration']) : '';
-        $expiry_date = !empty($expiry) ? Carbon::parse($expiry)->format('Y-m-d') : '';
-        $current_date = Carbon::now()->format('Y-m-d');
-        $posted_services = $user->services->count();
-        $posted_featured_services = $user->services->where('is_featured', 'true')->count();
-        $payment_settings = SiteManagement::getMetaValue('commision');
-        $package_status = '';
-        if (empty($payment_settings)) {
-            $package_status = 'true';
-        } else {
-            $package_status = !empty($payment_settings[0]['enable_packages']) ? $payment_settings[0]['enable_packages'] : 'true';
-        }
-        if ($package_status === 'true') {
-//            if (!empty($package->count()) && $current_date > $expiry_date) {
-//                $json['type'] = 'error';
-//                $json['message'] = trans('lang.need_to_purchase_pkg');
-//                return $json;
-//            }
-
-            if ($request['is_featured'] == 'true') {
-                if (!empty($option['no_of_featured_services']) && $posted_featured_services >= intval($option['no_of_featured_services'])) {
+            if (!empty($request['latitude']) || !empty($request['longitude'])) {
+                $this->validate(
+                    $request,
+                    [
+                        'latitude' => ['regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
+                        'longitude' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/'],
+                    ]
+                );
+            }
+            $user = User::find(Auth::user()->id);
+            $package_item = Item::where('subscriber', Auth::user()->id)->first();
+            $package = !empty($package_item) ? Package::find($package_item->product_id) : '';
+            $option = !empty($package) ? unserialize($package->options) : '';
+            $expiry = !empty($option) ? $package_item->created_at->addDays($option['duration']) : '';
+            $expiry_date = !empty($expiry) ? Carbon::parse($expiry)->format('Y-m-d') : '';
+            $current_date = Carbon::now()->format('Y-m-d');
+            $posted_services = $user->services->count();
+            $posted_featured_services = $user->services->where('is_featured', 'true')->count();
+            $payment_settings = SiteManagement::getMetaValue('commision');
+            $package_status = '';
+            if (empty($payment_settings)) {
+                $package_status = 'true';
+            } else {
+                $package_status = !empty($payment_settings[0]['enable_packages']) ? $payment_settings[0]['enable_packages'] : 'true';
+            }
+            if ($package_status === 'true') {
+                if (!empty($package->count()) && $current_date > $expiry_date) {
                     $json['type'] = 'error';
-                    $json['message'] = trans('lang.sorry_can_only_feature')  . ' ' . $option['no_of_featured_services'] . ' ' . trans('lang.services_acc_to_pkg');
+                    $json['message'] = trans('lang.need_to_purchase_pkg');
                     return $json;
                 }
-            }
-            if (!empty($option['no_of_services']) && $posted_services >= intval($option['no_of_services'])) {
-                $json['type'] = 'error';
-                $json['message'] = trans('lang.sorry_cannot_submit') . ' ' . $option['no_of_services'] . ' ' . trans('lang.services_acc_to_pkg');
-                return $json;
+
+                if ($request['is_featured'] == 'true') {
+                    if (!empty($option['no_of_featured_services']) && $posted_featured_services >= intval($option['no_of_featured_services'])) {
+                        $json['type'] = 'error';
+                        $json['message'] = trans('lang.sorry_can_only_feature')  . ' ' . $option['no_of_featured_services'] . ' ' . trans('lang.services_acc_to_pkg');
+                        return $json;
+                    }
+                }
+                if (!empty($option['no_of_services']) && $posted_services >= intval($option['no_of_services'])) {
+                    $json['type'] = 'error';
+                    $json['message'] = trans('lang.sorry_cannot_submit') . ' ' . $option['no_of_services'] . ' ' . trans('lang.services_acc_to_pkg');
+                    return $json;
+                } else {
+                    $image_size = array(
+                        'small',
+                        'medium'
+                    );
+                    $service_post = $this->service->storeService($request, $image_size);
+                    if ($service_post['type'] == 'success') {
+                        $json['type'] = 'success';
+                        $json['progress'] = trans('lang.service_publishing');
+                        $json['message'] = trans('lang.service_post_success');
+                        // Send Email
+                        $user = User::find(Auth::user()->id);
+                        //send email to admin
+                        if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+                            $service = $this->service::where('id', $service_post['new_service'])->first();
+                            $email_params = array();
+                            $email_params['service_title'] = $service->title;
+                            $email_params['posted_service_link'] = url('/service/' . $service->slug);
+                            $email_params['name'] = Helper::getUserName(Auth::user()->id);
+                            $email_params['link'] = url('profile/' . $user->slug);
+                            $template_data = Helper::getAdminServicePostedEmailContent();
+                            Mail::to(config('mail.username'))
+                                ->send(
+                                    new AdminEmailMailable(
+                                        'admin_email_new_service_posted',
+                                        $template_data,
+                                        $email_params
+                                    )
+                                );
+                        }
+                        return $json;
+                    } elseif ($service_post['type'] == 'error') {
+                        $json['type'] = 'error';
+                        $json['message'] = trans('lang.need_to_purchase_pkg');
+                        return $json;
+                    } elseif ($service_post['type'] == 'service_warning') {
+                        $json['type'] = 'error';
+                        $json['message'] = trans('lang.not_authorize');
+                        return $json;
+                    }
+                }
             } else {
                 $image_size = array(
                     'small',
@@ -246,7 +288,7 @@ class ServiceController extends Controller
                         $email_params['name'] = Helper::getUserName(Auth::user()->id);
                         $email_params['link'] = url('profile/' . $user->slug);
                         $template_data = Helper::getAdminServicePostedEmailContent();
-                        Mail::to(env('MAIL_FROM_ADDRESS'))
+                        Mail::to(config('mail.username'))
                             ->send(
                                 new AdminEmailMailable(
                                     'admin_email_new_service_posted',
@@ -267,45 +309,9 @@ class ServiceController extends Controller
                 }
             }
         } else {
-            $image_size = array(
-                'small',
-                'medium'
-            );
-            $service_post = $this->service->storeService($request, $image_size);
-            if ($service_post['type'] == 'success') {
-                $json['type'] = 'success';
-                $json['progress'] = trans('lang.service_publishing');
-                $json['message'] = trans('lang.service_post_success');
-                // Send Email
-                $user = User::find(Auth::user()->id);
-                //send email to admin
-                if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
-                    $service = $this->service::where('id', $service_post['new_service'])->first();
-                    $email_params = array();
-                    $email_params['service_title'] = $service->title;
-                    $email_params['posted_service_link'] = url('/service/' . $service->slug);
-                    $email_params['name'] = Helper::getUserName(Auth::user()->id);
-                    $email_params['link'] = url('profile/' . $user->slug);
-                    $template_data = Helper::getAdminServicePostedEmailContent();
-                    Mail::to(env('MAIL_FROM_ADDRESS'))
-                        ->send(
-                            new AdminEmailMailable(
-                                'admin_email_new_service_posted',
-                                $template_data,
-                                $email_params
-                            )
-                        );
-                }
-                return $json;
-            } elseif ($service_post['type'] == 'error') {
-                $json['type'] = 'error';
-                $json['message'] = trans('lang.need_to_purchase_pkg');
-                return $json;
-            } elseif ($service_post['type'] == 'service_warning') {
-                $json['type'] = 'error';
-                $json['message'] = trans('lang.not_authorize');
-                return $json;
-            }
+            $json['type'] = 'error';
+            $json['message'] = trans('lang.verify_accnt_post_service');
+            return $json;
         }
     }
 
@@ -481,8 +487,8 @@ class ServiceController extends Controller
             $this->validate(
                 $request,
                 [
-                    'latitude' => ['regex:/^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}$/'],
-                    'longitude' => ['regex:/^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,6}$/'],
+                    'latitude' => ['regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
+                    'longitude' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/'],
                 ]
             );
         }
@@ -802,7 +808,7 @@ class ServiceController extends Controller
                 $service_list[$key]['attachments'] = Helper::getUnserializeData($service->attachments);
                 $attachments = Helper::getUnserializeData($service->attachments);
                 // $service_list[$key]['enable_slider'] = !empty($attachments) ? 'wt-servicesslider' : '';
-                $service_list[$key]['enable_slider'] = count($attachments) > 1 ? 'wt-freelancerslider owl-carousel' : '';
+                $service_list[$key]['enable_slider'] = !empty($attachments) && count($attachments) > 1 ? 'wt-freelancerslider owl-carousel' : '';
                 $service_list[$key]['no_attachments'] = empty($attachments) ? 'la-service-info' : '';
                 $service_list[$key]['total_orders'] = Helper::getServiceCount($service->id, 'hired');
                 $service_list[$key]['seller_name'] = !empty($service->seller[0]) ? Helper::getUserName($service->seller[0]->id) : '';

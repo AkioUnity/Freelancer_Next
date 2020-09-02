@@ -65,11 +65,18 @@
                                     </tr>
                                     <b-modal ref="myModalRef-{{$key}}" hide-footer title="Email Content" v-cloak>
                                         <div class="d-block text-center">
-                                            {!! Form::open(['url' => '', 'class' =>'wt-formtheme wt-formfeedback', 'id' => 'update_content-'.$key,  '@submit.prevent'=>'']) !!}
+                                            {{-- {!! Form::open(['url' => '', 'class' =>'wt-formtheme wt-formfeedback', 'id' => 'update_content-'.$key,  '@submit.prevent'=>'']) !!}
                                                 <div class="form-group">
                                                     {!! Form::textarea('email_content', $template->content, array('class' => 'wt-tinymceeditor', 'id' => 'wt-tinymceeditor'.$key) ) !!}
                                                 </div>
-                                            {!! Form::close() !!}
+                                            {!! Form::close() !!} --}}
+                                            @php 
+                                                $body = "";
+                                                $body .= App\EmailHelper::getEmailHeader();
+                                                $body .= $template->content;
+                                                $body .= App\EmailHelper::getEmailFooter();
+                                                echo $body;
+                                            @endphp
                                          </div>
                                     </b-modal>
                                 @endforeach

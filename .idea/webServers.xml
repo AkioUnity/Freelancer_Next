@@ -10,7 +10,15 @@
           <option name="port" value="22" />
         </fileTransfer>
       </webServer>
-      <webServer id="20299da4-c811-4f03-a5c4-6746e037ac1d" name="new aws" url="http://198.24.168.162">
+      <webServer id="20299da4-c811-4f03-a5c4-6746e037ac1d" name="anew aws" url="http://198.24.168.162">
+        <fileTransfer host="198.24.168.162" port="22" rootFolder="/var/www/html" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+      <webServer id="659ec75b-3492-4788-b7a3-c80b5c591b2b" name="Design aws" url="http://198.24.168.162">
         <fileTransfer host="198.24.168.162" port="22" rootFolder="/var/www/design" accessType="SFTP">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />

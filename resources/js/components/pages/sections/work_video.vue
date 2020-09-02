@@ -24,12 +24,12 @@
                                     <img 
                                         :src="tempUrl+work_video.video_poster" 
                                         alt="image"
-                                        v-if="newVideoPosterImage"
+                                        v-if="newVideoPosterImage && work_video.video_poster"
                                     >
                                     <img 
                                         :src="imageUrl+work_video.video_poster" 
                                         alt="img description" 
-                                        v-else-if="pageID"
+                                        v-else-if="pageID && work_video.video_poster"
                                     />
                                 </a>
                             </figure>

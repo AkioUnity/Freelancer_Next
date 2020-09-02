@@ -38,8 +38,8 @@
                                         >
                                         </countdown>
                                     </div>
-                                </div>
-                            @endif
+                                </div>  
+                            @endif          
                         @endif
                         <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
                             <div class="wt-insightsitem wt-dashboardbox {{ $notify_class }}">

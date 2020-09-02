@@ -54,9 +54,10 @@
                         class="wt-productrangeslider wt-themerangeslider"
                         range
                         :min="0" 
-                        :max="1000" 
+                        :max="max_value"
+                        :reverse="reverse"
                         @change="onChange" 
-                        :defaultValue="[0, 1000]"
+                        :defaultValue="[0, max_value]"
                     />
                 </div>
             </fieldset>
@@ -71,6 +72,7 @@
     props: ['style_type', 'widget_type', 'no_record_message', 'placeholder', 'freelancer_placeholder', 'employer_placeholder', 'job_placeholder', 'service_placeholder', 'slider', 'symbol'],
         data(){
             return {
+                reverse: false,
                 selected_location:'',
                 locations:'',
                 filters:[],
@@ -89,6 +91,7 @@
                 type_change:false,
                 start:0,
                 end:1000,
+                max_value:1000,
             }
         },
         methods: {
@@ -114,6 +117,14 @@
                     if ( response.data.type == 'success') {
                         self.filters = response.data.result;
                     }
+                });
+            },
+            getPriceRangeLimit () {
+                let self = this;
+                axios.get(APP_URL + '/search/get-price-limit')
+                .then(function (response) {
+                    self.max_value = response.data
+                    self.end = response.data
                 });
             },
             getLocations () {
@@ -148,7 +159,6 @@
                             self.searchable_data = response.data.searchables;
                         }
                     }
-                    // console.log(self.searchable_data)
                 });
             },
             emptyField:function(types){
@@ -267,10 +277,14 @@
                     }
                 });
             });
+            if ($("body").hasClass("rtl")) {
+                this.reverse = true
+            }
         },
         created: function () {
             this.getFilters();
             this.getLocations();
+            this.getPriceRangeLimit();
             var urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('type')) {
                 var type = urlParams.get('type');

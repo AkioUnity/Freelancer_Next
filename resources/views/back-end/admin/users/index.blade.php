@@ -29,6 +29,7 @@
                                         <th>{{{ trans('lang.user_name') }}}</th>
                                         <th>{{{ trans('lang.ph_email') }}}</th>
                                         <th>{{{ trans('lang.role') }}}</th>
+                                        <th>{{{ trans('lang.verification_status') }}}</th>
                                         <th>{{{ trans('lang.action') }}}</th>
                                     </tr>
                                 </thead>
@@ -40,6 +41,13 @@
                                                 <td>{{{ ucwords(\App\Helper::getUserName($user->id)) }}}</td>
                                                 <td>{{{ $user->email }}}</td>
                                                 <td>{{ $user->getRoleNames()->first() }}</td>
+                                                <td id="verify_user-{{$user->id}}">
+                                                    @if ($user->user_verified == 1)
+                                                        <a href="javascript:;" class="" v-on:click.prevent="verifiedUserEmail('verify_user-{{$user->id}}', '{{$user->id}}', 'not_verify')">{{ trans('lang.verified') }}</a>
+                                                    @else
+                                                        <a href="javascript:;" class="" v-on:click.prevent="verifiedUserEmail('verify_user-{{$user->id}}', '{{$user->id}}', 'verify')">{{ trans('lang.not_verified') }}</a>
+                                                    @endif
+                                                </td>
                                                 <td>
                                                     <div class="wt-actionbtn">
                                                         <a href="javascript:void()" v-on:click.prevent="deleteUser({{$user->id}})" class="wt-deleteinfo wt-skillsaddinfo"><i class="fa fa-trash"></i></a>

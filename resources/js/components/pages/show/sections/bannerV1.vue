@@ -1,6 +1,6 @@
 <template>
     <div 
-        :class="banner.sectionClass + ' wt-homebannerseven'"
+        :class="[banner.backgroundType =='gradient' ? 'wt-bannersevenvtwo' :'' , banner.sectionClass + ' wt-homebannerseven']"
         :id="banner.sectionId" 
         :style="sectionStyle" 
         v-if="Object.entries(banner).length != 0"
@@ -26,33 +26,6 @@
                             v-if="banner.showSearchForm"
                             >
                         </search-form>
-                        <!-- <form class="wt-formtheme wt-formbanner" v-if="banner.showSearchForm">
-                            <fieldset>
-                                <div class="form-group">
-                                    <input type="text" name="fullname" class="form-control" placeholder="I’m looking for">
-                                    <div class="wt-formoptions">
-                                        <div class="wt-dropdown">
-                                            <span>In: <em class="selected-search-type">Freelancers </em><i class="lnr lnr-chevron-down"></i></span>
-                                        </div>
-                                        <div class="wt-radioholder">
-                                            <span class="wt-radio">
-                                                <input id="wt-freelancers" data-title="Freelancers" type="radio" name="searchtype" value="freelancer" checked="">
-                                                <label for="wt-freelancers">Freelancers</label>
-                                            </span>
-                                            <span class="wt-radio">
-                                                <input id="wt-jobs" data-title="Jobs" type="radio" name="searchtype" value="job">
-                                                <label for="wt-jobs">Jobs</label>
-                                            </span>
-                                            <span class="wt-radio">
-                                                <input id="wt-company" data-title="Companies" type="radio" name="searchtype" value="job">
-                                                <label for="wt-company">Companies</label>
-                                            </span>
-                                        </div>
-                                        <a href="userlisting.html" class="wt-searchbtn"><i class="lnr lnr-magnifier"></i> Search</a>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </form> -->
                         <div class="wt-videoholder">
                             <div class="wt-videoshow">
                                 <a data-rel="prettyPhoto[video]" :href="banner.videoUrl" rel="prettyPhoto[video]"><i class="fa fa-play"></i></a>
@@ -64,7 +37,7 @@
                     </div>
                 </div>
                 <div class="col-xl-4">
-                    <figure class="wt-homeseven-img">
+                    <figure class="wt-homeseven-img" v-if="banner.frontImg">
                         <img 
                             :src="tempUrl+banner.frontImg" 
                             alt="image"
@@ -109,7 +82,9 @@ export default {
                 padding: this.banner.padding ? `${this.banner.padding.top}${this.banner.padding.unit} ${this.banner.padding.right}${this.banner.padding.unit} ${this.banner.padding.bottom}${this.banner.padding.unit} ${this.banner.padding.left}${this.banner.padding.unit}` : '',
                 margin: this.banner.margin ? `${this.banner.margin.top}${this.banner.margin.unit} ${this.banner.margin.right}${this.banner.margin.unit} ${this.banner.margin.bottom}${this.banner.margin.unit} ${this.banner.margin.left}${this.banner.margin.unit}` : '',
                 'text-align': this.banner.alignment,
-                background: this.newBannerImage ? 'url('+ this.tempUrl + this.banner.backgroundImg+')' : this.pageID ? 'url('+ this.imageUrl + this.banner.backgroundImg+')' : this.banner.sectionColor
+                // background: this.newBannerImage ? 'url('+ this.tempUrl + this.banner.backgroundImg+')' : this.pageID ? 'url('+ this.imageUrl + this.banner.backgroundImg+')' : this.banner.sectionColor
+                 'background-image': this.banner.backgroundType =='gradient' ? ['url(' +  (this.newBannerImage?  this.tempUrl + this.banner.backgroundImg : this.pageID && this.banner.backgroundImg ? this.imageUrl + this.banner.backgroundImg : '') +'),' + 'linear-gradient(' + this.banner.gradientStyle + ','+ this.banner.gradient1 +',' + this.banner.gradient2 + ')'] 
+                    : [this.newBannerImage ? 'url('+ this.tempUrl + this.banner.backgroundImg+')' : this.pageID && this.banner.backgroundImg ? 'url('+ this.imageUrl + this.banner.backgroundImg+')' : '']
             }
         },
         contentSectionStyle() {
@@ -141,28 +116,6 @@ export default {
             this.newBannerImage = true
         })
     },
-    methods:{
-        // getPackages: function() {
-        //     var self = this;
-        //     let role = ''
-        //     if (this.roleType) {
-        //         role = 'employer'
-        //     } else {
-        //         role = 'freelancer'
-        //     }
-        //     axios
-        //     .get(APP_URL + '/get-top-banner_sec/' + role)
-        //     .then(function(response) {
-        //         if (response.data.type == "success") {
-        //             self.topPackages = response.data.banner_sec
-        //             self.package_options = response.data.package_options
-        //             console.log(self.package_options)
-        //             self.filtersApplied = true
-        //         }
-        //     })
-        //     .catch(function(error) {  });
-        // }
-    },
     created: function() {
         var self = this
         setTimeout(function(){ 
@@ -171,7 +124,6 @@ export default {
                 self.banner = self.banner_sec[index]
             }
         }, 100);
-        // this.getPackages()
     },
 };
 </script>

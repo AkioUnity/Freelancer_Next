@@ -108,14 +108,16 @@
                                         <h3 data-from="0" data-to="{{{ Helper::getProposals($user->id, 'completed')->count() }}}" data-speed="8000" data-refresh-interval="100">{{{ Helper::getProposals($user->id, 'completed')->count() }}}</h3>
                                         <h4>{{ trans('lang.completed_projects') }}</h4>
                                     </div>
-                                    <div class="wt-statisticcontent wt-countercolor4">
+                                    <div class="wt-statisticcontent wt-countercolor4" {{ !empty($show_earnings) && ($show_earnings !== true && $show_earnings !== 'true') ? 'style=width:100%' : '' }}>
                                         <h3 data-from="0" data-to="{{{ Helper::getProposals($user->id, 'cancelled')->count() }}}" data-speed="800" data-refresh-interval="02">{{{ Helper::getProposals($user->id, 'cancelled')->count() }}}</h3>
                                         <h4>{{ trans('lang.cancelled_projects') }}</h4>
                                     </div>
-                                    <div class="wt-statisticcontent wt-countercolor3">
-                                        <h3 data-from="0" data-to="{{ $amount }}" data-speed="8000" data-refresh-interval="100">{{ empty($amount) ? $symbol.'0.00' : $symbol."".$amount }}</h3>
-                                        <h4>{{ trans('lang.total_earnings') }}</h4>
-                                    </div>
+                                    @if (!empty($show_earnings) && ($show_earnings === true || $show_earnings === 'true'))
+                                        <div class="wt-statisticcontent wt-countercolor3">
+                                            <h3 data-from="0" data-to="{{ $amount }}" data-speed="8000" data-refresh-interval="100">{{ empty($amount) ? $symbol.'0.00' : $symbol."".$amount }}</h3>
+                                            <h4>{{ trans('lang.total_earnings') }}</h4>
+                                        </div>
+                                    @endif
                                     <div class="wt-description">
                                         <p>{{ trans('lang.send_offer_note') }}</p>
                                         <a href="javascript:void(0);" @click.prevent='sendOffer("{{$auth_user}}")' class="wt-btn">{{{ trans('lang.btn_send_offer') }}}</a>
@@ -528,6 +530,7 @@
         _wt_freelancerslider.owlCarousel({
             items: 1,
             loop:true,
+            rtl:true,
             nav:true,
             margin: 0,
             autoplay:false,

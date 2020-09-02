@@ -81,6 +81,7 @@ Route::post('register/login-register-user', 'PublicController@loginUser')->name(
 Route::post('register/verify-user-code', 'PublicController@verifyUserCode');
 Route::post('register/form-step1-custom-errors', 'PublicController@RegisterStep1Validation');
 Route::post('register/form-step2-custom-errors', 'PublicController@RegisterStep2Validation');
+Route::post('register/single-form-custom-errors', 'PublicController@singleFormValidation');
 Route::get('search-results', 'PublicController@getSearchResult')->name('searchResults');
 Route::post('user/add-wishlist', 'UserController@addWishlist');
 //send email test
@@ -233,6 +234,7 @@ Route::group(
         Route::post('admin/get/innerpage-settings', 'SiteManagementController@getInnerPageSettings');
         Route::get('admin/get/registration-settings', 'SiteManagementController@getRegistrationSettings');
         Route::get('admin/get/site-payment-option', 'SiteManagementController@getSitePaymentOption');
+        // Route::get('admin/theme-style-settings', 'SiteManagementController@ThemeStyleSettings');
         Route::post('admin/store/theme-styling-settings', 'SiteManagementController@storeThemeStylingSettings');
         Route::get('admin/get-theme-color-display-setting', 'SiteManagementController@getThemeColorDisplaySetting');
         Route::post('admin/store/registration-settings', 'SiteManagementController@storeRegistrationSettings');
@@ -294,6 +296,9 @@ Route::group(
         Route::get('get-pages-list', 'PageController@getPagesList');
         Route::get('get-saved-pages-order', 'SiteManagementController@getPagesOrder');
         Route::get('admin/get-menu-color-setting', 'SiteManagementController@getMenuColorSetting');
+        
+        Route::get('get-parent-menu-list', 'SiteManagementController@getParentMenuList');
+        Route::get('get-saved-custom-menus-list', 'SiteManagementController@getSavedMenusList');
     }
 );
 
@@ -421,6 +426,9 @@ Route::group(
         Route::post('profile/settings/save-email-settings', 'UserController@saveEmailNotificationSettings');
         Route::post('profile/settings/save-account-settings', 'UserController@saveAccountSettings');
         Route::get('profile/settings/delete-account', 'UserController@deleteAccount')->name('deleteAccount');
+        Route::get('profile/settings/email-verification', 'UserController@emailVerificationSettings')->name('emailVerification');
+        Route::post('user/resend-verification-code', 'UserController@resendCode');
+        Route::post('user/verify-user-code', 'UserController@reVerifyUserCode');
         Route::post('profile/settings/delete-user', 'UserController@destroy');
         Route::post('admin/delete-user', 'UserController@deleteUser');
         Route::get('profile/settings/get-manage-account', 'UserController@getManageAccountData');
@@ -441,7 +449,7 @@ Route::group(
         Route::get('freelancer/{type}/invoice', 'UserController@getFreelancerInvoices')->name('freelancerInvoice');
         Route::get('show/invoice/{id}', 'UserController@showInvoice');
         Route::post('service/upload-temp-message_attachments', 'ServiceController@uploadTempMessageAttachments');
-        Route::post('user/verify/emailcode', 'UserController@verifyUserEmailCode');
+        // Route::post('user/verify/emailcode', 'UserController@verifyUserEmailCode');
         Route::post('user/update-payout-detail', 'UserController@updatePayoutDetail');
         Route::get('user/get-payout-detail', 'UserController@getPayoutDetail');
         Route::post('user/upload-temp-image/{type?}', 'UserController@uploadTempImage');
@@ -471,7 +479,7 @@ Route::get('get-categories', 'CategoryController@getCategories');
 Route::get('get-seven-categories', 'CategoryController@getSevenCategories');
 Route::get('get-articles', 'PublicController@getArticles');
 Route::get('get-home-slider/{id}', 'PageController@getSlider');
-Route::get('section/get-iframe/{video}', 'PublicController@getVideo');
+// Route::get('section/get-iframe/{video}', 'PublicController@getVideo');
 Route::get('get-top-freelancers', 'FreelancerController@getTopFreelancers');
 Route::get('get-all-freelancers', 'FreelancerController@getAllFreelancers');
 Route::get('get-services', 'ServiceController@getServices');
@@ -487,6 +495,7 @@ Route::post('payment/paypal_post', 'PaypalController@paypal_post')->name('paypal
 //Route::get('user/products/thankyou', 'UserController@thankyou');
 Route::get('payment-process/{id}', 'EmployerController@employerPaymentProcess');
 Route::get('search/get-search-filters', 'PublicController@getFilterlist');
+Route::get('search/get-price-limit', 'PublicController@getPriceLimit');
 Route::post('search/get-searchable-data', 'PublicController@getSearchableData');
 Route::post('search/get-searchable-data-v2', 'PublicController@getSearchableDataV2');
 Route::get('channels/{channel}/messages', 'MessageController@index')->name('message');

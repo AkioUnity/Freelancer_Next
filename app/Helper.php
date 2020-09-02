@@ -214,17 +214,8 @@ class Helper extends Model
      */
     public static function getBannerImage($image, $path = '')
     {
-        if (empty($image) && isset($_GET['type']) && $_GET['type'] == 'freelancer') {
-            $banner =  'images/frbanner-1920x400.jpg';
-        } elseif (empty($image) && isset($_GET['type']) && $_GET['type'] == 'employer') {
-            $banner =  'images/e-1110x300.jpg';
-        } elseif (empty($image) && isset($_GET['type']) && ($_GET['type'] == 'job' || $_GET['type'] == 'service')) {
-            $banner =  'images/bannerimg/img-02.jpg';
-        } elseif (Request::segment(1) == 'articles') {
-            $banner =  'images/bannerimg/img-02.jpg';
-        } elseif (empty($image)) {
-            $banner =  'images/bannerimg/img-02.jpg';
-        } else {
+        $banner = '';
+        if (!empty($image) && !empty($path)) {
             $banner = $path . '/' . $image;
         }
         return $banner;
@@ -1046,7 +1037,7 @@ class Helper extends Model
      */
     public static function getUserName($user_id)
     {
-        if (!empty($user_id)) {
+        if (!empty($user_id) && !empty(User::find($user_id))) {
             return User::find($user_id)->first_name . ' ' . User::find($user_id)->last_name;
         } else {
             return '';
@@ -1538,7 +1529,7 @@ class Helper extends Model
         // $profile_image = User::find($user_id)->profile->avater;
         $profile_image = !empty(User::find($user_id)->profile->avater) ? User::find($user_id)->profile->avater : '';
         if (file_exists(self::publicPath() . '/uploads/users/' . $user_id . '/' . $profile_image)) {
-            return !empty($profile_image) ? '/uploads/users/' . $user_id . '/' . $profile_image.'?v1' : '/images/user.jpg';
+            return !empty($profile_image) ? '/uploads/users/' . $user_id . '/' . $profile_image : '/images/user.jpg';
         } else {
             return '/images/user.jpg';
         }
@@ -2633,7 +2624,7 @@ class Helper extends Model
                 'numeric_code'  => 566 ,
                 'code'          => 'NGN' ,
                 'name'          => 'Nigerian naira' ,
-                'symbol'        => '' ,
+                'symbol'        => '₦' ,
                 'fraction_name' => 'Kobo' ,
                 'decimals'      => 2 ) ,
             'NIO' => array (
@@ -2780,7 +2771,7 @@ class Helper extends Model
                 'numeric_code'  => 938 ,
                 'code'          => 'SDG' ,
                 'name'          => 'Sudanese pound' ,
-                'symbol'        => '£' ,
+                'symbol'        => 'ج.س' ,
                 'fraction_name' => 'Piastre' ,
                 'decimals'      => 2 ) ,
             'SEK' => array (
@@ -5124,6 +5115,154 @@ class Helper extends Model
             echo '<option value="' . $value['slug'] . '" data-image="'.url("uploads/locations/".$value["flag"]).'">' . $cat_indent . $value['title'] . '</option>';
             self::displaySearchLocationList($value['id'], $cat_indent . '—');
         }
+    }
+    
+        /**
+     * List category in tree format
+     *
+     * @param string  $slug   slug
+     *
+     * @access public
+     *
+     * @return array
+     */
+    public static function getCustomMenuChild($slug)
+    {
+        $custom_menu_child = DB::table('metas')
+        ->where('meta_key', '=', 'custom_link')
+        ->where('meta_value', '=', $slug)
+        ->pluck('metable_id');
+        $custom_menu_pages = array ();
+        $count = 0;
+        if (!empty($custom_menu_child)) {
+            foreach ($custom_menu_child as $value) {
+                $custom_menu_pages[$count] = Page::select('title', 'slug', 'id')->where('id', $value)->get()->first()->toArray();
+                $count++;
+            }
+        }
+        // dd($custom_menu_pages);
+        $menu_settings = !empty(SiteManagement::getMetaValue('menu_settings')) ? SiteManagement::getMetaValue('menu_settings') : array();
+        // dd($menu_settings['count']);
+        foreach ($menu_settings['custom_links'] as $custom_value) {
+            if (!empty($custom_value['parent_menu']) && $custom_value['parent_menu'] == $slug) {
+                // dd($custom_value['custom_title']);
+                $custom_menu_pages[$count]['title'] = $custom_value['custom_title'];
+                $custom_menu_pages[$count]['slug'] = $custom_value['custom_slug'];
+                $custom_menu_pages[$count]['link'] = $custom_value['custom_link'];
+                $custom_menu_pages[$count]['type'] = 'custom_menu';
+                $count++;
+            }
+
+            // dd($custom_value);
+        }
+        return $custom_menu_pages;
+        // dd($custom_menu_pages);
+        // dd($custom_menu_child);
+    }
+
+    /**
+     * List category in tree format
+     *
+     * @param string  $slug   slug
+     *
+     * @access public
+     *
+     * @return array
+     */
+    public static function getCustomMenuPageOrder($slug)
+    {
+        $menu_settings = !empty(SiteManagement::getMetaValue('menu_settings')) ? SiteManagement::getMetaValue('menu_settings') : array();
+        if (!empty($menu_settings['pages'])) {
+            foreach ($menu_settings['pages'] as $menu) {
+                if ($menu['type'] == 'custom_menu' && $menu['id'] == $slug) {
+                    return $menu['order'];
+                }
+            }
+        }
+    }
+
+    /**
+     * Display email warning
+     *
+     * @access public
+     *
+     * @return array
+     */
+    public static function displayVerificationWarning ()
+    {
+        $register_form = SiteManagement::getMetaValue('reg_form_settings');
+        $selected_registration_type = !empty($register_form) && !empty($register_form[0]['registration_type']) ? $register_form[0]['registration_type'] : 'multiple';
+        $output = "";
+        if (auth()->user()->getRoleNames()->first() != 'admin') {
+            if (Auth::user()->user_verified == 0 && $selected_registration_type == 'multiple') {
+                $output .= '<div class="wt-jobalertsholder la-email-warning float-right">';
+                $output .= '<ul id="wt-jobalerts">';
+                $output .= '<li class="alert alert-danger alert-email alert-dismissible fade show">';
+                $output .= '<span>';
+                $output .= trans('lang.user_email_not_verify');
+                $output .= '</span>';
+                $output .= '<a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i></a>';
+                $output .= '</li>';
+                $output .= '</ul>';
+                $output .= '</div>';
+            } else if (Auth::user()->user_verified == 0 && $selected_registration_type == 'single') {
+                $output .= '<div class="wt-jobalertsholder la-email-warning float-right">';
+                $output .= '<ul id="wt-jobalerts">';
+                $output .= '<li class="alert alert-danger alert-email alert-dismissible fade show">';
+                $output .= '<span>';
+                $output .= trans('lang.user_email_not_verify_admin');
+                $output .= '</span>';
+                $output .= '<a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i></a>';
+                $output .= '</li>';
+                $output .= '</ul>';
+                $output .= '</div>';
+            }
+        }
+        echo $output;
+    }
+
+     /**
+     * Get registration types
+     *
+     * @access public
+     *
+     * @return array()
+     */
+    public static function getRegisterationTypes ($key = '')
+    {
+        $list = array(
+            'single' => trans('lang.single_form'),
+            'multiple' => trans('lang.multi_steps_form'),
+        );
+
+        if (!empty($key) && array_key_exists($key, $list)) {
+            return $list[$key];
+        } else {
+            return $list;
+        }
+        return $list;
+    }
+    
+    /**
+     * Get verification types
+     *
+     * @access public
+     *
+     * @return array()
+     */
+    public static function getVerificationTypes ($key = '')
+    {
+        $list = array(
+            'auto_verify' => trans('lang.auto_verify'),
+            'admin_verify' => trans('lang.admin_verify'),
+        );
+
+        if (!empty($key) && array_key_exists($key, $list)) {
+            return $list[$key];
+        } else {
+            return $list;
+        }
+        return $list;
     }
 
     public static function getAutoVersion($file)

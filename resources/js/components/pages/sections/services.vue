@@ -20,11 +20,13 @@
                     <div class="wt-freelancers-holder wt-freelancers-home row" v-if="access_type == 'service' || access_type == 'both'">
                         <div class="col-12 col-sm-12 col-md-6 col-lg-4 float-left" v-for="(service_item, index) in serviceList" :key="index">
                             <div :class="'wt-freelancers-info ' +service_item.no_attachments">
-                                <carousel id="wt-freelancers-silder" class="wt-freelancers wt-freelancers-silder" :items='1' :loop='true' :nav='false' :dots='false' :autoplay='false' v-if="service_item.attachments && service_item.seller.length > 0">
-                                    <figure class="item" v-for="(attachment, attachmentIndex) in service_item.attachments" :key="attachmentIndex">
-                                        <a :href="baseUrl+'/profile/'+service_item.seller[0].slug" v-if="service_item.seller[0].slug"><img :src="attachment" alt="img description" class="item"></a>
-                                    </figure>
-                                </carousel>
+                                <!-- <carousel id="wt-freelancers-silder" class="wt-freelancers wt-freelancers-silder" :items='1' :loop='true' :nav='false' :dots='false' :autoplay='false' v-if="service_item.attachments && service_item.seller.length > 0"> -->
+                                    <div :class="'wt-freelancers ' +service_item.enable_slider" v-if="service_item.attachments && service_item.seller.length > 0">
+                                        <figure class="item" v-for="(attachment, attachmentIndex) in service_item.attachments" :key="attachmentIndex">
+                                            <a :href="baseUrl+'/profile/'+service_item.seller[0].slug" v-if="service_item.seller[0].slug"><img :src="attachment" alt="img description" class="item"></a>
+                                        </figure>
+                                    </div>
+                                <!-- </carousel> -->
                                 <span class="wt-featuredtagvtwo" v-if="service_item.is_featured = 'true'">{{ trans('lang.featured') }}</span>
                                 <div class="wt-freelancers-details">
                                     <figure class="wt-freelancers-img" v-if="service_item.seller_count > 0">
@@ -117,6 +119,20 @@ export default {
             .then(function(response) {
                 if (response.data.type == "success") {
                     self.serviceList =response.data.services
+                    Vue.nextTick(function(){
+                        var _wt_freelancerslider = jQuery('.wt-freelancerslider')
+                        _wt_freelancerslider.owlCarousel({
+                            items: 1,
+                            loop:true,
+                            rtl:true,
+                            nav:true,
+                            margin: 0,
+                            autoplay:false,
+                            navClass: ['wt-prev', 'wt-next'],
+                            navContainerClass: 'wt-search-slider-nav',
+                            navText: ['<span class="lnr lnr-chevron-left"></span>', '<span class="lnr lnr-chevron-right"></span>'],
+                        });
+                    })
                 }
             })
             .catch(function(error) {  });

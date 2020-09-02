@@ -102,17 +102,31 @@ class Page extends Model
             $this->title = filter_var($request->title, FILTER_SANITIZE_STRING);
             $this->slug = filter_var($request->title, FILTER_SANITIZE_STRING);
             $this->body = !empty($request->body) ? $request->body : 'null';
-            if ($request->parent_id) {
-                $this->relation_type = 1;
-            } else {
-                $this->relation_type = 0;
-            }
+            if ($request->parent_type == 'page') {
+                if ($request->parent_id) {
+                    $this->relation_type = 1;
+                } else {
+                    $this->relation_type = 0;
+                }
+            } 
             $this->save();
             $page_id =  $this->id;
             $new_path = Helper::PublicPath() . '/uploads/pages/' . $page_id;
             $page = self::findOrFail($this->id);
             $page_banner = '';
-            // dd($request['meta']);
+            if ($request->parent_type == 'custom_link') {
+                $meta = new Meta();
+                $meta->meta_key = 'custom_link';
+                $meta->meta_value = $request->parent_id;
+                $page->meta()->save($meta);
+
+            }
+            if (!empty($request->parent_type)) {
+                $meta = new Meta();
+                $meta->meta_key = 'parent_type';
+                $meta->meta_value = $request->parent_type;
+                $page->meta()->save($meta);
+            }
             if (!empty($request['meta'])) {
                 foreach ($request['meta'] as $key => $value) {
                     if (!empty($value)) {
@@ -552,6 +566,7 @@ class Page extends Model
      */
     public function updatePage($id, $request)
     {
+        // dd($request);
         $old_path = Helper::PublicPath() . '/uploads/pages/temp';
         if (!empty($id) && !empty($request)) {
             $pages = Page::find($id);
@@ -560,10 +575,12 @@ class Page extends Model
             }
             $pages->title = filter_var($request->title, FILTER_SANITIZE_STRING);
             $pages->body = !empty($request->body) ? $request->body : 'null';
-            if ($request->parent_id == null) {
-                $pages->relation_type = 0;
-            } elseif ($request->parent_id) {
-                $pages->relation_type = 1;
+            if ($request->parent_type == 'page') {
+                if ($request->parent_id == null) {
+                    $pages->relation_type = 0;
+                } elseif ($request->parent_id) {
+                    $pages->relation_type = 1;
+                }
             }
             $pages->save();
             $new_path = Helper::PublicPath() . '/uploads/pages/' . $id;
@@ -573,8 +590,21 @@ class Page extends Model
             $attachments = array();
             $work_tab_section = array();
             $page_banner = '';
+            $pages->meta()->delete();
+            if ($request->parent_type == 'custom_link') {
+                $meta = new Meta();
+                $meta->meta_key = 'custom_link';
+                $meta->meta_value = $request->parent_id;
+                $pages->meta()->save($meta);
+
+            }
+            if (!empty($request->parent_type)) {
+                $meta = new Meta();
+                $meta->meta_key = 'parent_type';
+                $meta->meta_value = $request->parent_type;
+                $pages->meta()->save($meta);
+            }
             if (!empty($request['meta'])) {
-                $pages->meta()->delete();
                 foreach ($request['meta'] as $key => $value) {
                     if (!empty($value)) {
                         if ($key == 'headings' || $key == 'freelancers' || $key == 'cat' || $key == 'services' || $key == 'articles') {

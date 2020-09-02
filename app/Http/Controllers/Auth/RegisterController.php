@@ -27,6 +27,7 @@ use App\SiteManagement;
 use App\EmailTemplate;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\GeneralEmailMailable;
+use App\Mail\AdminEmailMailable;
 
 /**
  * Class RegisterController
@@ -125,29 +126,72 @@ class RegisterController extends Controller
     {
         $json = array();
         $user = new User();
-        $random_number = Helper::generateRandomCode(4);
-        $verification_code = strtoupper($random_number);
-        $user_id = $user->storeUser($request, $verification_code);
+
+        $register_form = SiteManagement::getMetaValue('reg_form_settings');
+        $registration_type = !empty($register_form) && !empty($register_form[0]['registration_type']) ? $register_form[0]['registration_type'] : 'multiple';
+        $verification_type = !empty($register_form) && !empty($register_form[0]['verification_type']) ? $register_form[0]['verification_type'] : 'admin_verify';
+        $verification_code = '';
+        if ($registration_type !== 'single' && $verification_type !== 'auto_verify') {
+            $random_number = Helper::generateRandomCode(4);
+            $verification_code = strtoupper($random_number);
+        }
+
+        $user_id = $user->storeUser($request, $verification_code, $registration_type, $verification_type);
         session()->put(['user_id' => $user_id]);
         session()->put(['email' => $request['email']]);
         session()->put(['password' => $request['password']]);
         if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
             $email_params = array();
-            $template = DB::table('email_types')->select('id')
-                ->where('email_type', 'verification_code')->get()->first();
-            if (!empty($template->id)) {
-                $template_data = EmailTemplate::getEmailTemplateByID($template->id);
-                $email_params['verification_code'] = $user->verification_code;
-                $email_params['name'] = Helper::getUserName($user->id);
-                $email_params['email'] = $user->email;
-                Mail::to($user->email)
-                    ->send(
-                        new GeneralEmailMailable(
-                            'verification_code',
-                            $template_data,
-                            $email_params
-                        )
-                    );
+            if ($registration_type !== 'single' && $verification_type !== 'auto_verify') {
+                $template = DB::table('email_types')->select('id')
+                    ->where('email_type', 'verification_code')->get()->first();
+                if (!empty($template->id)) {
+                    $template_data = EmailTemplate::getEmailTemplateByID($template->id);
+                    $email_params['verification_code'] = $user->verification_code;
+                    $email_params['name'] = Helper::getUserName($user->id);
+                    $email_params['email'] = $user->email;
+                    Mail::to($user->email)
+                        ->send(
+                            new GeneralEmailMailable(
+                                'verification_code',
+                                $template_data,
+                                $email_params
+                            )
+                        );
+                }
+            } else {
+                $template = DB::table('email_types')->select('id')->where('email_type', 'new_user')->get()->first();
+                if (!empty($template->id)) {
+                    $template_data = EmailTemplate::getEmailTemplateByID($template->id);
+                    $email_params['name'] = Helper::getUserName($user->id);
+                    $email_params['email'] = $user->email;
+                    $email_params['password'] = $request['password'];
+                    Mail::to($user->email)
+                        ->send(
+                            new GeneralEmailMailable(
+                                'new_user',
+                                $template_data,
+                                $email_params
+                            )
+                        );
+                }
+                $admin_template = DB::table('email_types')->select('id')->where('email_type', 'admin_email_registration')->get()->first();
+                if (!empty($template->id)) {
+                    $template_data = EmailTemplate::getEmailTemplateByID($admin_template->id);
+                    $email_params['name'] = Helper::getUserName($user->id);
+                    $email_params['email'] = $user->email;
+                    $email_params['link'] = url('profile/' . $user->slug);
+                    Mail::to(config('mail.username'))
+                        ->send(
+                            new AdminEmailMailable(
+                                'admin_email_registration',
+                                $template_data,
+                                $email_params
+                            )
+                        );
+                }
+                session()->forget('password');
+                session()->forget('email');
             }
         } else {
             $id = Session::get('user_id');

@@ -50,7 +50,34 @@
                 </div>
             </div>
         </div>
-        <div class="amt-section-select" v-if="parentPages.length > 0">
+        <div class="form-group" >
+            <div class="amt-element-title amt-element-titlecontent amt-subsection">
+                <h6>{{ trans('lang.select_parent') }}:</h6>
+                <div class="amt-subsection__content">
+                    <div class="wt-radio">
+                        <input type="radio" id="select-parent" v-model="form.parent_type" name="parent_type" value="custom_link">
+                        <label for="select-parent">{{ trans('lang.custom_menu') }}:</label>
+                    </div>
+                    <div class="wt-radio">
+                        <input type="radio" id="select-paret" v-model="form.parent_type" name="parent_type" value="page">
+                        <label for="select-paret">{{ trans('lang.pages') }}:</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Custom Menus -->
+        <div class="amt-section-select" v-if="customMenus && customMenus.length > 0 && form.parent_type == 'custom_link'">
+            <span class="wt-select">
+                <select class="form-control" v-model="form.parent_id">
+                    <option value='' selected>{{ trans('lang.select_custom_menu') }}</option>
+                    <option v-for="(menu, index) in customMenus" :key="index" :value="menu.custom_slug"> 
+                        {{menu.custom_title}} 
+                    </option>
+                </select>
+            </span>
+        </div>
+        <!-- End Custom Menus -->
+        <div class="amt-section-select" v-if="parentPages.length > 0 && form.parent_type == 'page'">
             <span class="wt-select">
                 <select class="form-control" v-model="form.parent_id">
                     <option value='' selected>{{ trans('lang.select_parent') }}</option>
@@ -96,6 +123,7 @@ export default {
         return {
             baseURL: APP_URL,
             tempUrl:APP_URL+'/uploads/pages/temp/',
+            customMenus:''
         }
     },
     methods:{
@@ -125,6 +153,16 @@ export default {
                 this.form.page_banner_value = null
             }
         },
-    }
+        getCustomMenus () {
+            let self = this;
+            axios.get(APP_URL + '/get-parent-menu-list')
+            .then(function (response) {
+                self.customMenus = response.data.parent_menus;
+            });
+        },
+    },
+    created () {
+        this.getCustomMenus();
+    } 
 }
 </script>

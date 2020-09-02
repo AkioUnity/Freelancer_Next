@@ -32,63 +32,61 @@
     @endphp
 @endif
 @if (!empty($selected_header) && ($selected_header == 'style4' || $selected_header == 'style2'))
-    @if (!empty($pageType) && $pageType == 'showPage')
-        @php $hide_banner = !empty($show_banner) && $show_banner == 'true' ? 'false' : 'true';   @endphp
-        @if($hide_banner == 'false')
-            <div id="wt-innerbannerholdertwo" class="wt-haslayout wt-innerbannerholdertwo" style="background-image:url({{{ !empty($banner) ? asset($banner) : ''}}})">
-        @endif
-    @elseif (!empty($path))
-        <div id="wt-innerbannerholdertwo" class="wt-haslayout wt-innerbannerholdertwo {{$inner_header_style4_bg}}" style="background-image:url({{{ !empty($show_banner) && $show_banner == 'true' ? asset(Helper::getBannerImage($inner_banner, $path)) : ''}}})">
-    @else
-        <div id="wt-innerbannerholdertwo" class="wt-haslayout wt-innerbannerholdertwo {{$inner_header_style4_bg}}" style="background-image:url({{{ !empty($show_banner) && $show_banner == 'true' ? asset(Helper::getBannerImage($inner_banner, 'uploads/settings/general')) : '' }}})">
-    @endif
+    @php $hide_banner = !empty($show_banner) && $show_banner == 'true' ? 'false' : 'true';   @endphp
     @if($hide_banner == 'false')
-            <div class="container">
-                <div class="row justify-content-md-center">
-                    <div class="col-12 col-lg-4">
-                        <div class="wt-innerbannercontent wt-bannertitletwo">
-                            @if (!empty($pageType) && $pageType == 'showPage' )
-                                @if (!empty($page) && $show_title == true)
-                                    <div class="wt-title">
-                                        <h2>{{{ $page['title'] }}}</h2>
-                                    </div>
-                                @endif
-                            @else
-                                <div class="wt-title"><h1>{{ $title }}</h1></div>	
-                            @endif
-                            @if (!empty($show_breadcrumbs) && $show_breadcrumbs === 'true')
-                                <ol class="wt-breadcrumb">
-                                    @if (!empty($breadcrumbs))
-                                        @foreach ($breadcrumbs as $breadcrumb)
-                                            @if ($breadcrumb->url && !$loop->last)
-                                                <li><a href="{{{ $breadcrumb->url }}}">{{{ $breadcrumb->title }}}</a></li>
-                                            @else
-                                                <li class="active">{{{ $breadcrumb->title }}}</li>
-                                            @endif
-                                        @endforeach
+        @if (!empty($pageType) && $pageType == 'showPage')
+            <div id="wt-innerbannerholdertwo" class="wt-haslayout wt-innerbannerholdertwo" style="background-image:url({{{ !empty($banner) ? asset($banner) : ''}}})">
+        @elseif (!empty($path))
+            <div id="wt-innerbannerholdertwo" class="wt-haslayout wt-innerbannerholdertwo {{$inner_header_style4_bg}}" style="background-image:url({{{ !empty($show_banner) && $show_banner == 'true' ? asset(Helper::getBannerImage($inner_banner, $path)) : ''}}})">
+        @else
+            <div id="wt-innerbannerholdertwo" class="wt-haslayout wt-innerbannerholdertwo {{$inner_header_style4_bg}}" style="background-image:url({{{ !empty($show_banner) && $show_banner == 'true' ? asset(Helper::getBannerImage($inner_banner, 'uploads/settings/general')) : '' }}})">
+        @endif
+                <div class="container">
+                    <div class="row justify-content-md-center">
+                        <div class="col-12 col-lg-4">
+                            <div class="wt-innerbannercontent wt-bannertitletwo">
+                                @if (!empty($pageType) && $pageType == 'showPage' )
+                                    @if (!empty($page) && $show_title == true)
+                                        <div class="wt-title">
+                                            <h2>{{{ $page['title'] }}}</h2>
+                                        </div>
                                     @endif
-                                </ol>
-                            @endif						       
+                                @else
+                                    <div class="wt-title"><h1>{{ $title }}</h1></div>	
+                                @endif
+                                @if (!empty($show_breadcrumbs) && $show_breadcrumbs === 'true')
+                                    <ol class="wt-breadcrumb">
+                                        @if (!empty($breadcrumbs))
+                                            @foreach ($breadcrumbs as $breadcrumb)
+                                                @if ($breadcrumb->url && !$loop->last)
+                                                    <li><a href="{{{ $breadcrumb->url }}}">{{{ $breadcrumb->title }}}</a></li>
+                                                @else
+                                                    <li class="active">{{{ $breadcrumb->title }}}</li>
+                                                @endif
+                                            @endforeach
+                                        @endif
+                                    </ol>
+                                @endif						       
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-12 col-lg-8">
-                        <div class="wt-bannercontent wt-bannercontentseven">
-                            <search-form
-                                :widget_type="'home'"
-                                :placeholder="'{{ trans('lang.looking_for') }}'"
-                                :freelancer_placeholder="'{{ trans('lang.search_filter_list.freelancer') }}'"
-                                :employer_placeholder="'{{ trans('lang.search_filter_list.employers') }}'"
-                                :job_placeholder="'{{ trans('lang.search_filter_list.jobs') }}'"
-                                :service_placeholder="'{{ trans('lang.search_filter_list.services') }}'"
-                                :no_record_message="'{{ trans('lang.no_record') }}'"
-                                :style_type="'new'"
-                                >
-                            </search-form>
+                        <div class="col-12 col-lg-8">
+                            <div class="wt-bannercontent wt-bannercontentseven">
+                                <search-form
+                                    :widget_type="'home'"
+                                    :placeholder="'{{ trans('lang.looking_for') }}'"
+                                    :freelancer_placeholder="'{{ trans('lang.search_filter_list.freelancer') }}'"
+                                    :employer_placeholder="'{{ trans('lang.search_filter_list.employers') }}'"
+                                    :job_placeholder="'{{ trans('lang.search_filter_list.jobs') }}'"
+                                    :service_placeholder="'{{ trans('lang.search_filter_list.services') }}'"
+                                    :no_record_message="'{{ trans('lang.no_record') }}'"
+                                    :style_type="'new'"
+                                    >
+                                </search-form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
     @endif
 @else
     @if (!empty($show_banner) && $show_banner == 'true')
@@ -124,3 +122,12 @@
         </div>
     @endif
 @endif
+@push('scripts')
+@if (!empty($selected_header) && ($selected_header == 'style4' || $selected_header == 'style2'))
+    @if($hide_banner !== 'false')
+        <script>
+            $('main').css('margin-top','65px');
+        </script>
+    @endif
+@endif
+@endpush

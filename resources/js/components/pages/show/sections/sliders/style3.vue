@@ -75,16 +75,6 @@ export default {
         },
     },
     updated () {
-        var slider = jQuery('.owl-carousel')
-        slider.owlCarousel({
-            items: 1,
-            animateOut: 'fadeOut',
-            animateIn: 'fadeIn',
-            loop:true,
-            nav:false,
-            margin: 0,
-            autoplay:true,
-        });
         jQuery("a[data-rel]").each(function () {
             jQuery(this).attr("rel", jQuery(this).data("rel"));
         });
@@ -102,13 +92,26 @@ export default {
         });
     },
     methods:{
-        getSlider: function() {
+        async getSlider () {
             var self = this;
-            axios
+            await axios
             .get(APP_URL + "/get-home-slider/"+self.page_id)
             .then(function(response) {
                 if (response.data.type == "success") {
                    self.slider = response.data.slider
+                   Vue.nextTick(function() {
+                        var slider = jQuery('.owl-carousel')
+                        slider.owlCarousel({
+                            items: 1,
+                            rtl:true,
+                            animateOut: 'fadeOut',
+                            animateIn: 'fadeIn',
+                            loop:true,
+                            nav:false,
+                            margin: 0,
+                            autoplay:true,
+                        });
+                    })
                 }
             })
             .catch(function(error) {  });

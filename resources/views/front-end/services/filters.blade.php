@@ -29,8 +29,9 @@
                             id="wt-pricerange"
                             class="wt-productrangeslider wt-themerangeslider"
                             range
-                            :min="0" 
+                            :min="0"
                             :max="1000" 
+                            :reverse="reverse"
                             @change="onChange"
                             :default-value="[start, end]"
                             ref="priceRange"

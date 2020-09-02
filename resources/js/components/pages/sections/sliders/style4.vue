@@ -30,18 +30,7 @@
                 </div>
             </div>
         </div>
-        <carousel 
-            id="wt-home-slider" 
-            class="wt-home-slider"
-            :items='1'
-            :animateOut="'fadeOut'"
-            :animateIn="'fadeIn'"
-            :loop='true'
-            :nav='false'
-            :margin='0'
-            :autoplay='true'
-            v-if="newSliderImage || page_id"
-        >
+        <div id="wt-home-slider" class="wt-home-slider owl-carousel owl-loaded owl-drag" v-if="newSliderImage || page_id">
             <figure class="item" v-for="(slide, index) in slider.slider_image" :key="index">
                 <img 
                     :src="tempUrl+slide" 
@@ -54,7 +43,7 @@
                     v-else-if="pageID"
                 />
             </figure>
-        </carousel>
+        </div>
     </section>
 </template>
 <script>
@@ -101,6 +90,30 @@ export default {
                 self.newSliderImage = true
             }, 10)
         })
+        var wt_home_slider = jQuery("#wt-home-slider")
+        wt_home_slider.owlCarousel({
+            items: 1,
+            loop:true,
+            nav:false,
+            margin: 0,
+            rtl:true,
+            autoplay:true,
+            animateOut: 'fadeOut',
+            animateIn: 'fadeIn'
+        });
     },
+    updated () {
+        var wt_home_slider = jQuery("#wt-home-slider")
+        wt_home_slider.owlCarousel({
+            items: 1,
+            loop:true,
+            nav:false,
+            margin: 0,
+            rtl:true,
+            autoplay:true,
+            animateOut: 'fadeOut',
+            animateIn: 'fadeIn'
+        });
+    }
 };
 </script>

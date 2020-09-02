@@ -1,12 +1,21 @@
 <template>
-  <div>
-    <GmapMap style="width: 100%; height: 210px;" :zoom="1" :center="{lat: this.latitude, lng: this.longitude}"
+  <div >
+    <GmapMap style="width: 100%; height: 210px;" :zoom="7" :center="{lat: this.latitude, lng: this.longitude}"
         ref="map">
       <GmapMarker v-for="(marker, index) in markers"
         :key="index"
         :position="marker.latLng"
         />
     </GmapMap>
+     <!-- <GmapMarker
+    :key="index"
+    v-for="(m, index) in markers"
+    :position="m.position"
+    :clickable="true"
+    :draggable="true"
+    @click="center=m.position"
+  />
+</GmapMap> -->
   </div>
 </template>
 
@@ -17,8 +26,24 @@ export default {
         return {
         markers: [],
         place: null,
+        long_val:null,
+        lat_val:null,
+        show_map:false
         }
     },
+    // mounted () {
+    //     console.log(typeof 31.5727279)
+    //     console.log(typeof this.longitude)
+    //     this.long_val = this.longitude
+    //     this.lat_val = this.latitude
+    //     var self = this
+    //     setTimeout(function() {
+    //         console.log('gaskdgkas')
+    //         if (self.longitude && self.latitude) {
+    //             self.show_map = true
+    //         }
+    //     },2000 )
+    // },
     description: `
     In which a random set of points are generated, and
     the bounds of the map are changed to fit the points

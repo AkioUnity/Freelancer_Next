@@ -1,7 +1,7 @@
 <template>
     <div class="element-preview-wrapper" v-on:click="editElement">
         <div 
-            :class="banner.sectionClass + ' wt-homebannerseven'"
+            :class="[banner.backgroundType =='gradient' ? 'wt-bannersevenvtwo' :'' , banner.sectionClass + ' wt-homebannerseven']"
             :id="banner.sectionId" 
             :style="sectionStyle" 
             v-if="Object.entries(banner).length != 0"
@@ -84,7 +84,11 @@ export default {
                 padding: this.banner.padding ? `${this.banner.padding.top}${this.banner.padding.unit} ${this.banner.padding.right}${this.banner.padding.unit} ${this.banner.padding.bottom}${this.banner.padding.unit} ${this.banner.padding.left}${this.banner.padding.unit}` : '',
                 margin: this.banner.margin ? `${this.banner.margin.top}${this.banner.margin.unit} ${this.banner.margin.right}${this.banner.margin.unit} ${this.banner.margin.bottom}${this.banner.margin.unit} ${this.banner.margin.left}${this.banner.margin.unit}` : '',
                 'text-align': this.banner.alignment,
-                background: this.newBannerImage ? 'url('+ this.tempUrl + this.banner.backgroundImg+')' : this.pageID && this.banner.backgroundImg ? 'url('+ this.imageUrl + this.banner.backgroundImg+')' : this.banner.sectionColor
+                // background: this.newBannerImage ? 'url('+ this.tempUrl + this.banner.backgroundImg+')' : this.pageID && this.banner.backgroundImg ? 'url('+ this.imageUrl + this.banner.backgroundImg+')' : '',
+                // 'background-image': this.banner.backgroundType =='gradient' ? 'url(' + this.bg_check+'),' + 'linear-gradient(' + this.banner.gradientStyle + ','+ this.banner.gradient1 +',' + this.banner.gradient2 + ')' 
+                //     : this.newBannerImage ? 'url('+ this.tempUrl + this.banner.backgroundImg+')' : this.pageID && this.banner.backgroundImg ? 'url('+ this.imageUrl + this.banner.backgroundImg+')' : ''
+                'background-image': this.banner.backgroundType =='gradient' ? ['url(' +  (this.newBannerImage?  this.tempUrl + this.banner.backgroundImg : this.pageID && this.banner.backgroundImg ? this.imageUrl + this.banner.backgroundImg : '') +'),' + 'linear-gradient(' + this.banner.gradientStyle + ','+ this.banner.gradient1 +',' + this.banner.gradient2 + ')'] 
+                    : [this.newBannerImage ? 'url('+ this.tempUrl + this.banner.backgroundImg+')' : this.pageID && this.banner.backgroundImg ? 'url('+ this.imageUrl + this.banner.backgroundImg+')' : '']
             }
         },
         contentSectionStyle() {

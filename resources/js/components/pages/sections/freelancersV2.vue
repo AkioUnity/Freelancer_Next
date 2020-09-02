@@ -6,9 +6,6 @@
             :style="sectionStyle" 
             v-if="Object.entries(freelancer).length != 0"
         >
-            <!-- <div class="wt-border-bg">
-                <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 109"><defs><style>.cls-3{fill:#f5f7fa;fill-rule:evenodd;}</style></defs><title>img-06</title><path class="cls-3" d="M0,0c392.2,126.94,699.94,121.9,932.18,75.56,42.25-8.42,62.22-14.27,109.76-24.18,340.48-70.91,642-47.06,878.06,0V109H.17Z"/></svg>
-            </div> -->
             <div class="wt-overlay-4" :style="[newBgImage ?
                 {'background-image': 'url('+tempUrl+freelancer.backgroundImg+')'} :
                 pageID && freelancer.backgroundImg ?
@@ -30,49 +27,52 @@
             </div>
             <div class="container-fluid">
                 <div class="row">
-                    <carousel id="wt-freelancers-silder" class="wt-freelancers-silder" :items='3' :loop='true' :nav='false' :dots='true' :autoplay='false' :margin='30' v-if="filtersApplied">
-                        <div class="wt-freelancer" v-for="(freelancer, index) in topFreelancers" :key="index">
-                            <figure class="wt-freelancer-img">
-                                <img :src="freelancer.image" alt="image">
-                            </figure>
-                            <div class="wt-freelancer-head">
-                                <div class="wt-freelancer-tag">
-                                    <a :href="baseUrl+'/profile/'+freelancer.slug">{{freelancer.name}}</a>
-                                </div>
-                                <div class="wt-title">
-                                    <h3>{{freelancer.tagline}}</h3>
-                                </div>
-                                <div class="wt-freelancer-about">
-                                    <div class="wt-freelancer-price"><span><i class="fas fa-money-bill-alt"></i> {{freelancer.symbol}}{{freelancer.hourly_rate}} / hr </span></div>
-                                    <div class="wt-rating">
-                                        <span class="wt-stars wt-starstwo"><span></span></span> <em>{{freelancer.average_rating_count}}{{ trans('lang.5') }}</em>
+                    <!-- <carousel id="wt-freelancers-silder" class="wt-freelancers-silder" :items='3' :loop='true' :nav='false' :dots='true' 
+                    :autoplay='false' :margin='30' v-if="filtersApplied"> -->
+                        <div id="wt-freelancers-silder" class="wt-freelancers-silder owl-carousel">
+                            <div class="wt-freelancer" v-for="(freelancer, index) in topFreelancers" :key="index">
+                                <figure class="wt-freelancer-img">
+                                    <img :src="freelancer.image" alt="image">
+                                </figure>
+                                <div class="wt-freelancer-head">
+                                    <div class="wt-freelancer-tag">
+                                        <a :href="baseUrl+'/profile/'+freelancer.slug">{{freelancer.name}}</a>
+                                    </div>
+                                    <div class="wt-title">
+                                        <h3>{{freelancer.tagline}}</h3>
+                                    </div>
+                                    <div class="wt-freelancer-about">
+                                        <div class="wt-freelancer-price"><span><i class="fas fa-money-bill-alt"></i> {{freelancer.symbol}}{{freelancer.hourly_rate}} / hr </span></div>
+                                        <div class="wt-rating">
+                                            <span class="wt-stars wt-starstwo"><span></span></span> <em>{{freelancer.average_rating_count}}{{ trans('lang.5') }}</em>
+                                        </div>
+                                    </div>
+                                    <div class="wt-freelancer-social">
+                                        <ul>
+                                            <li v-for="(skill, item) in freelancer.skills" :key="item">
+                                                <a href="javascript:void(0)">{{skill}}</a>
+                                            </li>
+                                            <li>
+                                                <span>[<a href="javascript:void(0)">...</a>]</span>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
-                                <div class="wt-freelancer-social">
-                                    <ul>
-                                        <li v-for="(skill, item) in freelancer.skills" :key="item">
-                                            <a href="javascript:void(0)">{{skill}}</a>
-                                        </li>
-                                        <li>
-                                            <span>[<a href="javascript:void(0)">...</a>]</span>
-                                        </li>
-                                    </ul>
-                                </div>
+                                <ul class="wt-freelancer-footer">
+                                    <li>
+                                        <address><i class="ti-location-pin"></i>{{freelancer.location}}</address>
+                                    </li>
+                                    <li v-if="freelancer.save_freelancers.includes(freelancer.id)">
+                                        <a href="javascript:void(0);"  :id="'freelancer-'+freelancer.id" @click.prevent="add_wishlist('freelancer-'+freelancer.id, freelancer.id, 'saved_freelancer')">
+                                        <i class="ti-heart"></i> {{trans("lang.saved")}}</a>
+                                    </li>
+                                    <li><a href="javascript:void(0);"  :id="'freelancer-'+freelancer.id" @click.prevent="add_wishlist('freelancer-'+freelancer.id, freelancer.id, 'saved_freelancer')">
+                                        <i class="ti-heart"></i> {{trans("lang.save")}}</a>
+                                    </li>
+                                </ul>
                             </div>
-                            <ul class="wt-freelancer-footer">
-                                <li>
-                                    <address><i class="ti-location-pin"></i>{{freelancer.location}}</address>
-                                </li>
-                                <li v-if="freelancer.save_freelancers.includes(freelancer.id)">
-                                    <a href="javascript:void(0);"  :id="'freelancer-'+freelancer.id" @click.prevent="add_wishlist('freelancer-'+freelancer.id, freelancer.id, 'saved_freelancer')">
-                                    <i class="ti-heart"></i> {{trans("lang.saved")}}</a>
-                                </li>
-                                <li><a href="javascript:void(0);"  :id="'freelancer-'+freelancer.id" @click.prevent="add_wishlist('freelancer-'+freelancer.id, freelancer.id, 'saved_freelancer')">
-                                    <i class="ti-heart"></i> {{trans("lang.save")}}</a>
-                                </li>
-                            </ul>
                         </div>
-                    </carousel>
+                    <!-- </carousel> -->
                 </div>
             </div>
         </section>
@@ -175,6 +175,22 @@ export default {
                 if (response.data.type == "success") {
                     self.topFreelancers =response.data.freelancers
                     self.filtersApplied = true
+                    /* Freelancer Slider */
+                    Vue.nextTick(function() {
+                        var wt_freelancers_silder = jQuery(".wt-freelancers-silder")
+                        wt_freelancers_silder.owlCarousel({
+                            item: 3,
+                            loop:true,
+                            nav:false,
+                            margin: 30,
+                            rtl:true,
+                            autoplay:false,
+                            dots: true,
+                            dotsClass: 'wt-sliderdots',
+                            responsiveClass:true,
+                        
+                        });
+                    })
                 }
             })
             .catch(function(error) {  });

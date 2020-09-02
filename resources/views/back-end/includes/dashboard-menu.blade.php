@@ -20,13 +20,10 @@
         <div id="wt-verticalscrollbar" class="wt-verticalscrollbar">
             <div class="wt-companysdetails wt-usersidebar">
                 <figure class="wt-companysimg">
-                    <img src="{{{ asset(Helper::getUserProfileBanner($user->id, 'small')) }}}"
-                         alt="{{{ trans('lang.profile_banner') }}}">
+                    <img src="{{{ asset(Helper::getUserProfileBanner($user->id, 'small')) }}}" alt="{{{ trans('lang.profile_banner') }}}">
                 </figure>
                 <div class="wt-companysinfo">
-                    <figure><img
-                                src="{{{ asset(Helper::getImageWithSize('uploads/users/'.$user->id, $profile->avater, 'listing')) }}}"
-                                alt="{{ trans('lang.profile_photo') }}"></figure>
+                    <figure><img src="{{{ asset(Helper::getImageWithSize('uploads/users/'.$user->id, $profile->avater, 'listing')) }}}" alt="{{ trans('lang.profile_photo') }}"></figure>
                     <div class="wt-title">
                         <h2>
                             <a href="{{{ $role != 'admin' ? url($role.'/dashboard') : 'javascript:void()' }}}">
@@ -36,22 +33,16 @@
                         <span>{{{ !empty(Auth::user()->profile->tagline) ? str_limit(Auth::user()->profile->tagline, 26, '') : Helper::getAuthRoleName() }}}</span>
                     </div>
                     @if ($role === 'employer')
-                        @if (Helper::getAccessType() == 'both' || Helper::getAccessType() == 'jobs')
-                            <div class="wt-btnarea"><a href="{{{ url(route('employerPostJob')) }}}"
-                                                       class="wt-btn">{{{ trans('lang.post_job') }}}</a></div>
-                        @else
-                            <div class="wt-btnarea"><a
-                                        href="{{{ url(route('showUserProfile', ['slug' => Auth::user()->slug])) }}}"
-                                        class="wt-btn">{{{ trans('lang.view_profile') }}}</a></div>
-                        @endif
+                    @if (Helper::getAccessType() == 'both' || Helper::getAccessType() == 'jobs')
+                        <div class="wt-btnarea"><a href="{{{ url(route('employerPostJob')) }}}" class="wt-btn">{{{ trans('lang.post_job') }}}</a></div>
+                    @else
+                        <div class="wt-btnarea"><a href="{{{ url(route('showUserProfile', ['slug' => Auth::user()->slug])) }}}" class="wt-btn">{{{ trans('lang.view_profile') }}}</a></div>
+                    @endif
                     @elseif ($role === 'freelancer')
                         @if (Helper::getAccessType() == 'both' || Helper::getAccessType() == 'services')
-                            <div class="wt-btnarea"><a href="{{{ url(route('freelancerPostService')) }}}"
-                                                       class="wt-btn">{{{ trans('lang.post_service') }}}</a></div>
+                            <div class="wt-btnarea"><a href="{{{ url(route('freelancerPostService')) }}}" class="wt-btn">{{{ trans('lang.post_service') }}}</a></div>
                         @else
-                            <div class="wt-btnarea"><a
-                                        href="{{{ url(route('showUserProfile', ['slug' => Auth::user()->slug])) }}}"
-                                        class="wt-btn">{{{ trans('lang.view_profile') }}}</a></div>
+                            <div class="wt-btnarea"><a href="{{{ url(route('showUserProfile', ['slug' => Auth::user()->slug])) }}}" class="wt-btn">{{{ trans('lang.view_profile') }}}</a></div>
                         @endif
                     @endif
                 </div>
@@ -96,10 +87,10 @@
                             </ul>
                         </li>
                         <li>
-                        <a href="{{{ route('orderList') }}}">
-                        <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-                        <span>{{ trans('lang.orders') }}</span>
-                        </a>
+                            <a href="{{{ route('orderList') }}}">
+                                <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                                <span>{{ trans('lang.orders') }}</span>
+                            </a>
                         </li>
                         <li>
                             <a href="{{{ route('allJobs') }}}">
@@ -176,16 +167,9 @@
                                 <span>{{ trans('lang.settings') }}</span>
                             </a>
                             <ul class="sub-menu">
-                                <li>
-                                    <hr>
-                                    <a href="{{{ route('adminProfile') }}}">{{ trans('lang.acc_settings') }}</a></li>
-                                <li>
-                                    <hr>
-                                    <a href="{{{ url('admin/settings') }}}">{{ trans('lang.general_settings') }}</a>
-                                </li>
-                                <li>
-                                    <hr>
-                                    <a href="{{{ route('resetPassword') }}}">{{ trans('lang.reset_pass') }}</a></li>
+                                <li><hr><a href="{{{ route('adminProfile') }}}">{{ trans('lang.acc_settings') }}</a></li>
+                                <li><hr><a href="{{{ url('admin/settings') }}}">{{ trans('lang.general_settings') }}</a></li>
+                                <li><hr><a href="{{{ route('resetPassword') }}}">{{ trans('lang.reset_pass') }}</a></li>
                             </ul>
                         </li>
                         <li class="menu-item-has-children">
@@ -374,22 +358,10 @@
                                         <span>{{ trans('lang.manage_services') }}</span>
                                     </a>
                                     <ul class="sub-menu">
-                                        <li>
-                                            <hr>
-                                            <a href="{{{ route('ServiceListing', ['status'=>'posted']) }}}">{{ trans('lang.posted_services') }}</a>
-                                        </li>
-                                        <li>
-                                            <hr>
-                                            <a href="{{{ route('ServiceListing', ['status'=>'hired']) }}}">{{ trans('lang.ongoing_services') }}</a>
-                                        </li>
-                                        <li>
-                                            <hr>
-                                            <a href="{{{ route('ServiceListing', ['status'=>'completed']) }}}">{{ trans('lang.completed_services') }}</a>
-                                        </li>
-                                        <li>
-                                            <hr>
-                                            <a href="{{{ route('ServiceListing', ['status'=>'cancelled']) }}}">{{ trans('lang.cancelled_services') }}</a>
-                                        </li>
+                                        <li><hr><a href="{{{ route('ServiceListing', ['status'=>'posted']) }}}">{{ trans('lang.posted_services') }}</a></li>
+                                        <li><hr><a href="{{{ route('ServiceListing', ['status'=>'hired']) }}}">{{ trans('lang.ongoing_services') }}</a></li>
+                                        <li><hr><a href="{{{ route('ServiceListing', ['status'=>'completed']) }}}">{{ trans('lang.completed_services') }}</a></li>
+                                        <li><hr><a href="{{{ route('ServiceListing', ['status'=>'cancelled']) }}}">{{ trans('lang.cancelled_services') }}</a></li>
                                     </ul>
                                 </li>
                             @endif
@@ -413,10 +385,7 @@
                                         <span>{{ trans('lang.invoices') }}</span>
                                     </a>
                                     <ul class="sub-menu">
-                                        <li>
-                                            <hr>
-                                            <a href="{{{ url('freelancer/package/invoice') }}}">{{ trans('lang.pkg_inv') }}</a>
-                                        </li>
+                                        <li><hr><a href="{{{ url('freelancer/package/invoice') }}}">{{ trans('lang.pkg_inv') }}</a></li>
                                     </ul>
                                 </li>
                                 <li>
@@ -435,12 +404,10 @@
                         </li>
                     @endif
                     <li>
-                        <a href="{{ route('logout') }}"
-                           onclick="event.preventDefault(); document.getElementById('dashboard-logout-form').submit();">
+                        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('dashboard-logout-form').submit();">
                             <i class="lnr lnr-exit"></i>{{{trans('lang.logout')}}}
                         </a>
-                        <form id="dashboard-logout-form" action="{{ route('logout') }}" method="POST"
-                              style="display: none;">
+                        <form id="dashboard-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             {{ csrf_field() }}
                         </form>
                     </li>

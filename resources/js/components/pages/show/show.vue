@@ -1,5 +1,50 @@
 <template>
   <div>
+    <div v-for="(skeleton, index) in skeletons" :key="skeleton+index">
+      <slider-skeleton v-if="sliderSkeleton && slider_style !== 'style2' && slider_style !== 'style3' && (skeleton == 'slider' || skeleton == 'bannerV1')"/>
+      <div class="container wt-main-section" v-if="categorySkeleton && skeleton == 'category'">
+        <category-skeleton />
+     </div>
+      <div class="container wt-main-section" v-if="welcomeSkeleton && skeleton == 'welcome_section'">
+        <welcome-skeleton />
+     </div>
+      <div class="container wt-main-section" v-if="appSkeleton && skeleton == 'app_section'">
+        <app-skeleton />
+     </div>
+      <div class="container wt-main-section" v-if="serviceSkeleton && skeleton == 'service_section'">
+        <service-skeleton />
+     </div>
+      <div class="container wt-main-section" v-if="howWorkSkeleton && skeleton == 'work_tab_section'">
+        <how-work-skeleton />
+     </div>
+      <div class="container wt-main-section" v-if="freelancerSkeleton && skeleton == 'freelancer_section'">
+        <freelancer-skeleton />
+     </div>
+      <div class="container wt-main-section" v-if="articleSkeleton && skeleton == 'article_section'">
+        <article-skeleton />
+     </div>
+      <div class="container wt-main-section" v-if="workVideoSkeleton && skeleton == 'work_video_section'">
+        <work-video-skeleton />
+     </div>
+      <div class="container wt-main-section" v-if="categoryV2Skeleton && skeleton == 'categoryV2'">
+        <category-v2-skeleton />
+     </div>
+      <div class="container wt-main-section" v-if="jobSkeleton && skeleton == 'jobs_section'">
+        <job-skeleton />
+     </div>
+      <div class="container-fluid wt-main-section" v-if="freelancerV2Skeleton && skeleton == 'freelancer_section_v2'">
+        <freelancer-v2-skeleton />
+     </div>
+      <div class="container wt-main-section" v-if="packageSkeleton && skeleton == 'package_section'">
+        <package-skeleton />
+     </div>
+      <div class="container wt-main-section" v-if="categoryV3Skeleton && skeleton == 'categoryV3'">
+        <category-v3-skeleton />
+     </div>
+     <div class="container wt-main-section" v-if="headingSkeleton && skeleton == 'heading'">
+        <heading-skeleton />
+      </div>
+    </div>
     <div
       v-for="(element, index) in sections"
       :key="'section'+element.id+index"
@@ -157,10 +202,40 @@ import freelancersV2 from './sections/freelancersV2'
 import jobs from './sections/jobs'
 import packages from './sections/packages'
 import bannerV1 from './sections/bannerV1'
+import sliderSkeleton from './skeleton/slider'
+import categorySkeleton from './skeleton/categories'
+import welcomeSkeleton from './skeleton/welcome'
+import appSkeleton from './skeleton/app'
+import serviceSkeleton from './skeleton/services'
+import howWorkSkeleton from './skeleton/how-work'
+import freelancerSkeleton from './skeleton/freelancers'
+import articleSkeleton from './skeleton/articles'
+import workVideoSkeleton from './skeleton/work_video'
+import categoryV2Skeleton from './skeleton/categoriesV2'
+import jobSkeleton from './skeleton/jobs'
+import freelancerV2Skeleton from './skeleton/freelancersV2'
+import packageSkeleton from './skeleton/packages'
+import categoryV3Skeleton from './skeleton/categoriesV3'
+import headingSkeleton from './skeleton/heading'
 
 export default {
-  props:['page_id', 'access_type', 'auth_role', 'symbol'],
+  props:['page_id', 'access_type', 'auth_role', 'symbol', 'slider_style'],
   components: {
+    headingSkeleton,
+    categoryV3Skeleton,
+    packageSkeleton,
+    freelancerV2Skeleton,
+    jobSkeleton,
+    categoryV2Skeleton,
+    workVideoSkeleton,
+    articleSkeleton,
+    freelancerSkeleton,
+    howWorkSkeleton,
+    serviceSkeleton,
+    appSkeleton,
+    welcomeSkeleton,
+    categorySkeleton,
+    sliderSkeleton,
     slider,
     heading,
     editor,
@@ -181,6 +256,22 @@ export default {
   },
   data () {
     return {
+      skeletons:[],
+      headingSkeleton: false,
+      categoryV3Skeleton: false,
+      packageSkeleton: false,
+      freelancerV2Skeleton: false,
+      jobSkeleton: false,
+      categoryV2Skeleton: false,
+      workVideoSkeleton: false,
+      articleSkeleton: false,
+      freelancerSkeleton: false,
+      howWorkSkeleton: false,
+      serviceSkeleton: false,
+      appSkeleton: false,
+      sliderSkeleton: false,
+      categorySkeleton: false,
+      welcomeSkeleton: false,
       form: {
         meta_title: '',
         show_page_banner: true,
@@ -245,7 +336,56 @@ export default {
         .then(function (response) {
           if (response.data.type == 'success') {
             self.pageData = response.data.page
-            // console.log(self.pageData);
+            if (self.pageData.section_list) {
+                self.pageData.section_list.forEach(element => {
+                  self.skeletons.push(element.section)
+                  if (element.section == 'slider' || element.section == 'bannerV1') {
+                    self.sliderSkeleton = true 
+                  }
+                  if (element.section == 'category') {
+                    self.categorySkeleton = true 
+                  }
+                  if (element.section == 'welcome_section') {
+                    self.welcomeSkeleton = true 
+                  }
+                  if (element.section == 'app_section') {
+                    self.appSkeleton = true 
+                  }
+                  if (element.section == 'service_section') {
+                    self.serviceSkeleton = true 
+                  }
+                  if (element.section == 'work_tab_section') {
+                    self.howWorkSkeleton = true 
+                  }
+                  if (element.section == 'freelancer_section') {
+                    self.freelancerSkeleton = true 
+                  }
+                  if (element.section == 'article_section') {
+                    self.articleSkeleton = true 
+                  }
+                  if (element.section == 'work_video_section') {
+                    self.workVideoSkeleton = true 
+                  }
+                  if (element.section == 'categoryV2') {
+                    self.categoryV2Skeleton = true 
+                  }
+                  if (element.section == 'jobs_section') {
+                    self.jobSkeleton = true 
+                  }
+                  if (element.section == 'freelancer_section_v2') {
+                    self.freelancerV2Skeleton = true 
+                  }
+                  if (element.section == 'package_section') {
+                    self.packageSkeleton = true 
+                  }
+                  if (element.section == 'categoryV3') {
+                    self.categoryV3Skeleton = true 
+                  }
+                  if (element.section == 'heading') {
+                    self.headingSkeleton = true 
+                  }
+                });
+            }
             self.form.id = self.pageData.id
             self.form.title = self.pageData.title
             self.form.slug = self.pageData.slug
@@ -269,27 +409,37 @@ export default {
         .then(function (response) {
           if (response.data.type == 'success') {
             self.pageData.sections = response.data.section_data
-            // console.log(self.pageData.sections)
             if (self.pageData.section_list) {
               self.sections = self.pageData.section_list
-              // console.log(self.sections);
               var sectionArray = Object.keys(self.pageData.sections).map(i => self.pageData.sections[i]);
-              // var sectionArray = Object.keys(self.pageData.sections).map(i => self.pageData.sections[i])
-              // console.log(sectionArray)
               sectionArray.forEach(element => {
-                // console.log(element)
                 element = element.filter(function (sec) {
-                  // console.log('sec',sec)
                   self.sections.find(function (e) {
                     if (typeof sec != 'string') {
                       if (e.id == sec.id) {
                         self.form.meta[e.value].push(sec)
-                        // console.log(self.form.meta)
                       }
                     }
                   })
                 })
               })
+              setTimeout(() => {   
+                self.sliderSkeleton = false
+                self.categorySkeleton = false
+                self.welcomeSkeleton = false
+                self.appSkeleton = false
+                self.serviceSkeleton = false
+                self.howWorkSkeleton = false
+                self.freelancerSkeleton = false
+                self.articleSkeleton = false
+                self.workVideoSkeleton = false
+                self.categoryV2Skeleton = false
+                self.jobSkeleton = false
+                self.freelancerV2Skeleton = false
+                self.packageSkeleton = false
+                self.categoryV3Skeleton = false
+                self.headingSkeleton = false
+              }, 1000);
             }
           }
         })

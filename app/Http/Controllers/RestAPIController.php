@@ -1700,25 +1700,25 @@ class RestAPIController extends Controller
         $package_item = Item::where('subscriber', $current_user)->first();
         $package = Package::find($package_item->product_id);
         $option = !empty($package->options) ? unserialize($package->options) : '';
-        $expiry = !empty($option) ? $package_item->created_at->addDays($option['duration']) : '';
+        $expiry = !empty($option) ? $package_item->updated_at->addDays($option['duration']) : '';
         $expiry_date = !empty($expiry) ? Carbon::parse($expiry)->format('M d, Y') : '';
         $current_date = Carbon::now()->format('M d, Y');
         $posted_jobs = Job::where('user_id', $current_user)->count();
         $posted_featured_jobs = Job::where('user_id', $current_user)->where('is_featured', 'true')->count();
         $size = !empty($request['size']) ? $request['size'] : '';
-        if (!empty($package) && $current_date <= $expiry_date) {
-            if ($request['is_featured'] == 'true') {
-                if ($posted_featured_jobs >= intval($option['featured_jobs'])) {
-                    $json['type'] = 'error';
-                    $json['message'] = trans('lang.sorry_can_only_feature')  . ' ' . $option['featured_jobs'] . ' ' . trans('lang.jobs_acc_to_pkg');
-                    return Response::json($json, 203);
-                }
-            }
-            if ($posted_jobs >= intval($option['jobs'])) {
-                $json['type'] = 'error';
-                $json['message'] = trans('lang.sorry_cannot_submit') . ' ' . $option['jobs'] . ' ' . trans('lang.jobs_acc_to_pkg');
-                return Response::json($json, 203);
-            } else {
+//        if (!empty($package) && $current_date <= $expiry_date) {
+//            if ($request['is_featured'] == 'true') {
+//                if ($posted_featured_jobs >= intval($option['featured_jobs'])) {
+//                    $json['type'] = 'error';
+//                    $json['message'] = trans('lang.sorry_can_only_feature')  . ' ' . $option['featured_jobs'] . ' ' . trans('lang.jobs_acc_to_pkg');
+//                    return Response::json($json, 203);
+//                }
+//            }
+//            if ($posted_jobs >= intval($option['jobs'])) {
+//                $json['type'] = 'error';
+//                $json['message'] = trans('lang.sorry_cannot_submit') . ' ' . $option['jobs'] . ' ' . trans('lang.jobs_acc_to_pkg');
+//                return Response::json($json, 203);
+//            } else {
                 $random_number = Helper::generateRandomCode(8);
                 $code = strtoupper($random_number);
                 $location = $request['country'];
@@ -1808,14 +1808,14 @@ class RestAPIController extends Controller
                         }
                     }
                 }
-            }
+//            }
             $json['type'] = 'success';
             return Response::json($json, 200);
-        } else {
-            $json['type'] = 'error';
-            $json['message'] = trans('lang.need_to_purchase_pkg');
-            return Response::json($json, 203);
-        }
+//        } else {
+//            $json['type'] = 'error';
+//            $json['message'] = trans('lang.need_to_purchase_pkg').' '.$expiry_date;
+//            return Response::json($json, 203);
+//        }
     }
 
     /**

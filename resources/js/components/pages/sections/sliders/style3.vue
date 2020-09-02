@@ -40,18 +40,7 @@
                 </div>
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
                     <div class="wt-bannerslider-holder">
-                        <carousel 
-                            id="wt-bannerslider-two" 
-                            class="wt-bannerslider-two"
-                            :items='1'
-                            :animateOut="'fadeOut'"
-                            :animateIn="'fadeIn'"
-                            :loop='true'
-                            :nav='false'
-                            :margin='0'
-                            :autoplay='true'
-                            v-if="newSliderImage || page_id"
-                        >
+                        <div id="wt-bannerslider-two" class="wt-bannerslider-two owl-carousel" v-if="newSliderImage || page_id">
                             <div class="item" v-for="(slide, index) in slider.slider_image" :key="index">
                                 <figure class="wt-bannerimg">
                                     <img 
@@ -66,7 +55,7 @@
                                     />
                                 </figure>
                             </div>
-                        </carousel>
+                        </div>
                         <figure class="wt-slidericons">
                             <!-- Floating Img 1 -->
                             <img 
@@ -145,6 +134,30 @@ export default {
                 self.newSliderImage = true
             }, 10)
         })
+        var slider = jQuery('.wt-bannerslider-two')
+        slider.owlCarousel({
+            items: 1,
+            rtl:true,
+            animateOut: 'fadeOut',
+            animateIn: 'fadeIn',
+            loop:true,
+            nav:false,
+            margin: 0,
+            autoplay:true,
+        });
     },
+    updated () {
+        var slider = jQuery('.wt-bannerslider-two')
+        slider.owlCarousel({
+            items: 1,
+            rtl:true,
+            animateOut: 'fadeOut',
+            animateIn: 'fadeIn',
+            loop:true,
+            nav:false,
+            margin: 0,
+            autoplay:true,
+        });
+    }
 };
 </script>

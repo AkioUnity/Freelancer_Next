@@ -177,13 +177,13 @@ export default {
             }, 130);
         },
         imageRemoved: function(imageType) {
-            if (this.cloneElement == false) {
+            // if (this.cloneElement == false) {
                 if (imageType == 'bgImg') {
                     if (this.category.backgroundImg) {
                         this.category.backgroundImg = null
                     }
                 }
-            }
+            // }
         },
         removeImage: function(imageType, hiddenID) {
             if (imageType == 'bgImg') {

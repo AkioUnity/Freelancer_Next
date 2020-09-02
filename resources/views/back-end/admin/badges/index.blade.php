@@ -46,8 +46,8 @@
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="form-group la-color-picker">
-                                        <verte display="widget" v-model="color" menuPosition="left" model="hex"></verte>
+                                    <div class="form-group la-color-picker wt-la-color-picker">
+                                        <verte v-model="color" model="hex"></verte>
                                         <input type="hidden" name="color" :value="color">
                                     </div>
                                     <div class="form-group wt-btnarea">

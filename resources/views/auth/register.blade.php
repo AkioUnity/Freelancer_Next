@@ -20,6 +20,7 @@
     $show_emplyr_inn_sec = !empty($register_form) && !empty($register_form[0]['show_emplyr_inn_sec']) ? $register_form[0]['show_emplyr_inn_sec'] : 'true';
     $show_reg_form_banner = !empty($register_form) && !empty($register_form[0]['show_reg_form_banner']) ? $register_form[0]['show_reg_form_banner'] : 'true';
     $reg_form_banner = !empty($register_form) && !empty($register_form[0]['reg_form_banner']) ? $register_form[0]['reg_form_banner'] : null;
+    $selected_registration_type = !empty($register_form) && !empty($register_form[0]['registration_type']) ? $register_form[0]['registration_type'] : 'multiple';
     $breadcrumbs_settings = \App\SiteManagement::getMetaValue('show_breadcrumb');
     $show_breadcrumbs = !empty($breadcrumbs_settings) ? $breadcrumbs_settings : 'true';
 @endphp
@@ -45,223 +46,359 @@
                 <div class="wt-registerformhold">
                     <div class="wt-registerformmain">
                         <div class="wt-joinforms">
-                            <form method="POST" action="{{{ url('register/form-step1-custom-errors') }}}" class="wt-formtheme wt-formregister" @submit.prevent="checkStep1" id="register_form">
-                                @csrf
-                                <fieldset class="wt-registerformgroup">
-                                    <div class="wt-haslayout" v-if="step === 1" v-cloak>
-                                        <div class="wt-registerhead">
-                                            <div class="wt-title">
-                                                <h3>{{{ $reg_one_title }}}</h3>
-                                            </div>
-                                            <div class="wt-description">
-                                                <p>{{{ $reg_one_subtitle }}}</p>
-                                            </div>
-                                        </div>
-                                        <ul class="wt-joinsteps">
-                                            <li class="wt-active"><a href="javascrip:void(0);">{{{ trans('lang.01') }}}</a></li>
-                                            <li><a href="javascrip:void(0);">{{{ trans('lang.02') }}}</a></li>
-                                            <li><a href="javascrip:void(0);">{{{ trans('lang.03') }}}</a></li>
-                                            <li><a href="javascrip:void(0);">{{{ trans('lang.04') }}}</a></li>
-                                        </ul>
-                                        <div class="form-group form-group-half">
-                                            <input type="text" name="first_name" class="form-control" placeholder="{{{ trans('lang.ph_first_name') }}}" v-bind:class="{ 'is-invalid': form_step1.is_first_name_error }" v-model="first_name">
-                                            <span class="help-block" v-if="form_step1.first_name_error">
-                                                <strong v-cloak>@{{form_step1.first_name_error}}</strong>
-                                            </span>
-                                        </div>
-                                        <div class="form-group form-group-half">
-                                            <input type="text" name="last_name" class="form-control" placeholder="{{{ trans('lang.ph_last_name') }}}" v-bind:class="{ 'is-invalid': form_step1.is_last_name_error }" v-model="last_name">
-                                            <span class="help-block" v-if="form_step1.last_name_error">
-                                                <strong v-cloak>@{{form_step1.last_name_error}}</strong>
-                                            </span>
-                                        </div>
-                                        <div class="form-group">
-                                            <input id="user_email" type="email" class="form-control" name="email" placeholder="{{{ trans('lang.ph_email') }}}" value="{{ old('email') }}" v-bind:class="{ 'is-invalid': form_step1.is_email_error }" v-model="user_email">
-                                            <span class="help-block" v-if="form_step1.email_error">
-                                                <strong v-cloak>@{{form_step1.email_error}}</strong>
-                                            </span>
-                                        </div>
-                                        <div class="form-group">
-                                            <button type="submit" class="wt-btn">{{{  trans('lang.btn_startnow') }}}</button>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                                <div class="wt-haslayout" v-if="step === 2" v-cloak>
+                            @if ($selected_registration_type == 'single')
+                                <form method="POST"  class="wt-formtheme wt-formregister" @submit.prevent="checkSingleForm" id="register_form">
+                                    @csrf
                                     <fieldset class="wt-registerformgroup">
-                                        <div class="wt-registerhead">
-                                            <div class="wt-title">
-                                                <h3>{{{ $reg_two_title }}}</h3>
-                                            </div>
-                                            @if (!empty($reg_two_subtitle))
-                                                <div class="wt-description">
-                                                    <p>{{{ $reg_two_subtitle }}}</p>
+                                        <div class="wt-haslayout" v-if="step === 1" v-cloak>
+                                            <div class="wt-registerhead">
+                                                <div class="wt-title">
+                                                    <h3>{{{ $reg_one_title }}}</h3>
                                                 </div>
-                                            @endif
-                                        </div>
-                                        <ul class="wt-joinsteps">
-                                            <li class="wt-done-next"><a href="javascrip:void(0);"><i class="fa fa-check"></i></a></li>
-                                            <li class="wt-active"><a href="javascrip:void(0);">{{{ trans('lang.02') }}}</a></li>
-                                            <li><a href="javascrip:void(0);">{{{ trans('lang.03') }}}</a></li>
-                                            <li><a href="javascrip:void(0);">{{{ trans('lang.04') }}}</a></li>
-                                        </ul>
-                                        @if (!empty($locations))
-                                            <div class="form-group">
-                                                <span class="wt-select">
-                                                    {!! Form::select('locations', $locations, null, array('placeholder' => trans('lang.select_locations'), 'v-bind:class' => '{ "is-invalid": form_step2.is_locations_error }')) !!}
-                                                    <span class="help-block" v-if="form_step2.locations_error">
-                                                        <strong v-cloak>@{{form_step2.locations_error}}</strong>
-                                                    </span>
+                                                <div class="wt-description">
+                                                    <p>{{{ $reg_one_subtitle }}}</p>
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-group-half">
+                                                <input type="text" name="first_name" class="form-control" placeholder="{{{ trans('lang.ph_first_name') }}}" v-bind:class="{ 'is-invalid': form_step1.is_first_name_error }" v-model="first_name">
+                                                <span class="help-block" v-if="form_step1.first_name_error">
+                                                    <strong v-cloak>@{{form_step1.first_name_error}}</strong>
                                                 </span>
                                             </div>
-                                        @endif
-                                        <div class="form-group form-group-half">
-                                            <input id="password" type="password" class="form-control" name="password" placeholder="{{{ trans('lang.ph_pass') }}}" v-bind:class="{ 'is-invalid': form_step2.is_password_error }">
-                                            <span class="help-block" v-if="form_step2.password_error">
-                                                <strong v-cloak>@{{form_step2.password_error}}</strong>
-                                            </span>
-                                        </div>
-                                        <div class="form-group form-group-half">
-                                            <input id="password-confirm" type="password" class="form-control" name="password_confirmation" placeholder="{{{ trans('lang.ph_retry_pass') }}}" v-bind:class="{ 'is-invalid': form_step2.is_password_confirm_error }">
-                                            <span class="help-block" v-if="form_step2.password_confirm_error">
-                                                <strong v-cloak>@{{form_step2.password_confirm_error}}</strong>
-                                            </span>
+                                            <div class="form-group form-group-half">
+                                                <input type="text" name="last_name" class="form-control" placeholder="{{{ trans('lang.ph_last_name') }}}" v-bind:class="{ 'is-invalid': form_step1.is_last_name_error }" v-model="last_name">
+                                                <span class="help-block" v-if="form_step1.last_name_error">
+                                                    <strong v-cloak>@{{form_step1.last_name_error}}</strong>
+                                                </span>
+                                            </div>
+                                            <div class="form-group">
+                                                <input id="user_email" type="email" class="form-control" name="email" placeholder="{{{ trans('lang.ph_email') }}}" value="{{ old('email') }}" v-bind:class="{ 'is-invalid': form_step1.is_email_error }" v-model="user_email">
+                                                <span class="help-block" v-if="form_step1.email_error">
+                                                    <strong v-cloak>@{{form_step1.email_error}}</strong>
+                                                </span>
+                                            </div>
                                         </div>
                                     </fieldset>
-                                    <fieldset class="wt-formregisterstart">
-                                        <div class="wt-title wt-formtitle">
-                                            <h4>{{{ trans('lang.start_as') }}}</h4>
-                                        </div>
-                                        @if(!empty($roles))
-                                            <ul class="wt-accordionhold wt-formaccordionhold accordion">
-                                                @foreach ($roles as $key => $role)
-                                                    @if (!in_array($role['id'] == 1, $roles))
-                                                        <li v-bind:class="{ 'role-is-invalid': form_step2.is_role_error }">
-                                                            <div class="wt-accordiontitle" id="headingOne" data-toggle="collapse" data-target="#collapseOne">
-                                                                <span class="wt-radio">
-                                                                <input id="wt-company-{{$key}}" type="radio" name="role" value="{{{ $role['role_type'] }}}" checked="" v-model="user_role" v-on:change="selectedRole(user_role)">
-                                                                <label for="wt-company-{{$key}}">
-                                                                    {{ $role['name'] === 'freelancer' ? trans('lang.freelancer') : trans('lang.employer')}}
-                                                                    <span> 
-                                                                        ({{ $role['name'] === 'freelancer' ? trans('lang.signup_as_freelancer') : trans('lang.signup_as_country')}})
+                                    {{-- <div class="wt-haslayout"> --}}
+                                        <fieldset class="wt-registerformgroup">
+                                            @if (!empty($locations))
+                                                <div class="form-group">
+                                                    <span class="wt-select">
+                                                        {!! Form::select('locations', $locations, null, array('placeholder' => trans('lang.select_locations'), 'v-bind:class' => '{ "is-invalid": form_step2.is_locations_error }')) !!}
+                                                        <span class="help-block" v-if="form_step2.locations_error">
+                                                            <strong v-cloak>@{{form_step2.locations_error}}</strong>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            @endif
+                                            <div class="form-group form-group-half">
+                                                <input id="password" type="password" class="form-control" name="password" placeholder="{{{ trans('lang.ph_pass') }}}" v-bind:class="{ 'is-invalid': form_step2.is_password_error }">
+                                                <span class="help-block" v-if="form_step2.password_error">
+                                                    <strong v-cloak>@{{form_step2.password_error}}</strong>
+                                                </span>
+                                            </div>
+                                            <div class="form-group form-group-half">
+                                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" placeholder="{{{ trans('lang.ph_retry_pass') }}}" v-bind:class="{ 'is-invalid': form_step2.is_password_confirm_error }">
+                                                <span class="help-block" v-if="form_step2.password_confirm_error">
+                                                    <strong v-cloak>@{{form_step2.password_confirm_error}}</strong>
+                                                </span>
+                                            </div>
+                                        </fieldset>
+                                        <fieldset class="wt-formregisterstart">
+                                            <div class="wt-title wt-formtitle">
+                                                <h4>{{{ trans('lang.start_as') }}}</h4>
+                                            </div>
+                                            @if(!empty($roles))
+                                                <ul class="wt-accordionhold wt-formaccordionhold accordion">
+                                                    @foreach ($roles as $key => $role)
+                                                        @if (!in_array($role['id'] == 1, $roles))
+                                                            <li v-bind:class="{ 'role-is-invalid': form_step2.is_role_error }">
+                                                                <div class="wt-accordiontitle" id="headingOne" data-toggle="collapse" data-target="#collapseOne">
+                                                                    <span class="wt-radio">
+                                                                    <input id="wt-company-{{$key}}" type="radio" name="role" value="{{{ $role['role_type'] }}}" checked="" v-model="user_role" v-on:change="selectedRole(user_role)">
+                                                                    <label for="wt-company-{{$key}}">
+                                                                        {{ $role['name'] === 'freelancer' ? trans('lang.freelancer') : trans('lang.employer')}}
+                                                                        <span> 
+                                                                            ({{ $role['name'] === 'freelancer' ? trans('lang.signup_as_freelancer') : trans('lang.signup_as_country')}})
+                                                                        </span>
+                                                                    </label>
                                                                     </span>
-                                                                </label>
-                                                                </span>
-                                                            </div>
-                                                            @if ($role['role_type'] === 'employer')
-                                                                @if ($show_emplyr_inn_sec === 'true')
-                                                                    <div class="wt-accordiondetails collapse show" id="collapseOne" aria-labelledby="headingOne" v-if="is_show">
-                                                                        <div class="wt-radioboxholder">
-                                                                            <div class="wt-title">
-                                                                                <h4>{{{ trans('lang.no_of_employees') }}}</h4>
-                                                                            </div>
-                                                                            @foreach ($employees as $key => $employee)
-                                                                                <span class="wt-radio">
-                                                                                    <input id="wt-just-{{{$key}}}" type="radio" name="employees" value="{{{$employee['value']}}}" checked="">
-                                                                                    <label for="wt-just-{{{$key}}}">{{{$employee['title']}}}</label>
-                                                                                </span>
-                                                                            @endforeach
-                                                                        </div>
-                                                                        @if ($departments->count() > 0)
+                                                                </div>
+                                                                @if ($role['role_type'] === 'employer')
+                                                                    @if ($show_emplyr_inn_sec === 'true')
+                                                                        <div class="wt-accordiondetails collapse show" id="collapseOne" aria-labelledby="headingOne" v-if="is_show">
                                                                             <div class="wt-radioboxholder">
                                                                                 <div class="wt-title">
-                                                                                    <h4>{{{ trans('lang.your_department') }}}</h4>
+                                                                                    <h4>{{{ trans('lang.no_of_employees') }}}</h4>
                                                                                 </div>
-                                                                                @foreach ($departments as $key => $department)
+                                                                                @foreach ($employees as $key => $employee)
                                                                                     <span class="wt-radio">
-                                                                                        <input id="wt-department-{{{$department->id}}}" type="radio" name="department" value="{{{$department->id}}}" checked="">
-                                                                                        <label for="wt-department-{{{$department->id}}}">{{{$department->title}}}</label>
+                                                                                        <input id="wt-just-{{{$key}}}" type="radio" name="employees" value="{{{$employee['value']}}}" checked="">
+                                                                                        <label for="wt-just-{{{$key}}}">{{{$employee['title']}}}</label>
                                                                                     </span>
                                                                                 @endforeach
                                                                             </div>
-                                                                            <div class="form-group wt-othersearch d-none">
-                                                                                <input type="text" name="department_name" class="form-control" placeholder="{{{ trans('lang.enter_department') }}}">
-                                                                            </div>
-                                                                        @endif
-                                                                    </div>
-                                                                @endif    
-                                                            @endif
-                                                        </li>
-                                                    @endif
-                                                @endforeach
-                                            </ul>
-                                            <span class="help-block" v-if="form_step2.role_error">
-                                                <strong v-cloak>@{{form_step2.role_error}}</strong>
-                                            </span>
-                                        @endif
-                                    </fieldset>
-                                    <fieldset class="wt-termsconditions">
-                                        <div class="wt-checkboxholder">
-                                            <span class="wt-checkbox">
-                                                <input id="termsconditions" type="checkbox" name="termsconditions" checked="">
-                                                <label for="termsconditions"><span>{{{ $term_note }}}</span></label>
-                                                <span class="help-block" v-if="form_step2.termsconditions_error">
-                                                    <strong style="color: red;" v-cloak>{{trans('lang.register_termsconditions_error')}}</strong>
+                                                                            @if ($departments->count() > 0)
+                                                                                <div class="wt-radioboxholder">
+                                                                                    <div class="wt-title">
+                                                                                        <h4>{{{ trans('lang.your_department') }}}</h4>
+                                                                                    </div>
+                                                                                    @foreach ($departments as $key => $department)
+                                                                                        <span class="wt-radio">
+                                                                                            <input id="wt-department-{{{$department->id}}}" type="radio" name="department" value="{{{$department->id}}}" checked="">
+                                                                                            <label for="wt-department-{{{$department->id}}}">{{{$department->title}}}</label>
+                                                                                        </span>
+                                                                                    @endforeach
+                                                                                </div>
+                                                                                <div class="form-group wt-othersearch d-none">
+                                                                                    <input type="text" name="department_name" class="form-control" placeholder="{{{ trans('lang.enter_department') }}}">
+                                                                                </div>
+                                                                            @endif
+                                                                        </div>
+                                                                    @endif    
+                                                                @endif
+                                                            </li>
+                                                        @endif
+                                                    @endforeach
+                                                </ul>
+                                                <span class="help-block" v-if="form_step2.role_error">
+                                                    <strong v-cloak>@{{form_step2.role_error}}</strong>
                                                 </span>
-                                            </span>
-                                            <a href="#" @click.prevent="prev()" class="wt-btn">{{{ trans('lang.previous') }}}</a>
-                                            <a href="#" @click.prevent="checkStep2('{{ trans('lang.email_not_config') }}')" class="wt-btn">{{{ trans('lang.continue') }}}</a>
+                                            @endif
+                                        </fieldset>
+                                        <fieldset class="wt-termsconditions">
+                                            <div class="wt-checkboxholder">
+                                                <span class="wt-checkbox">
+                                                    <input id="termsconditions" type="checkbox" name="termsconditions" checked="">
+                                                    <label for="termsconditions"><span>{{{ $term_note }}}</span></label>
+                                                    <span class="help-block" v-if="form_step2.termsconditions_error">
+                                                        <strong style="color: red;" v-cloak>{{trans('lang.register_termsconditions_error')}}</strong>
+                                                    </span>
+                                                </span>
+                                                <a href="#" @click.prevent="checkSingleForm('{{ trans('lang.email_not_config') }}')" class="wt-btn">{{{ trans('lang.submit') }}}</a>
+                                            </div>
+                                        </fieldset>
+                                    {{-- </div> --}}
+                                </form>
+                            @else 
+                                <form method="POST" action="{{{ url('register/form-step1-custom-errors') }}}" class="wt-formtheme wt-formregister" @submit.prevent="checkStep1" id="register_form">
+                                    @csrf
+                                    <fieldset class="wt-registerformgroup">
+                                        <div class="wt-haslayout" v-if="step === 1" v-cloak>
+                                            <div class="wt-registerhead">
+                                                <div class="wt-title">
+                                                    <h3>{{{ $reg_one_title }}}</h3>
+                                                </div>
+                                                <div class="wt-description">
+                                                    <p>{{{ $reg_one_subtitle }}}</p>
+                                                </div>
+                                            </div>
+                                            <ul class="wt-joinsteps">
+                                                <li class="wt-active"><a href="javascrip:void(0);">{{{ trans('lang.01') }}}</a></li>
+                                                <li><a href="javascrip:void(0);">{{{ trans('lang.02') }}}</a></li>
+                                                <li><a href="javascrip:void(0);">{{{ trans('lang.03') }}}</a></li>
+                                                <li><a href="javascrip:void(0);">{{{ trans('lang.04') }}}</a></li>
+                                            </ul>
+                                            <div class="form-group form-group-half">
+                                                <input type="text" name="first_name" class="form-control" placeholder="{{{ trans('lang.ph_first_name') }}}" v-bind:class="{ 'is-invalid': form_step1.is_first_name_error }" v-model="first_name">
+                                                <span class="help-block" v-if="form_step1.first_name_error">
+                                                    <strong v-cloak>@{{form_step1.first_name_error}}</strong>
+                                                </span>
+                                            </div>
+                                            <div class="form-group form-group-half">
+                                                <input type="text" name="last_name" class="form-control" placeholder="{{{ trans('lang.ph_last_name') }}}" v-bind:class="{ 'is-invalid': form_step1.is_last_name_error }" v-model="last_name">
+                                                <span class="help-block" v-if="form_step1.last_name_error">
+                                                    <strong v-cloak>@{{form_step1.last_name_error}}</strong>
+                                                </span>
+                                            </div>
+                                            <div class="form-group">
+                                                <input id="user_email" type="email" class="form-control" name="email" placeholder="{{{ trans('lang.ph_email') }}}" value="{{ old('email') }}" v-bind:class="{ 'is-invalid': form_step1.is_email_error }" v-model="user_email">
+                                                <span class="help-block" v-if="form_step1.email_error">
+                                                    <strong v-cloak>@{{form_step1.email_error}}</strong>
+                                                </span>
+                                            </div>
+                                            <div class="form-group">
+                                                <button type="submit" class="wt-btn">{{{  trans('lang.btn_startnow') }}}</button>
+                                            </div>
                                         </div>
                                     </fieldset>
-                                </div>
-                            </form>
-                            <div class="wt-joinformc" v-if="step === 3" v-cloak>
-                                <form method="POST" action="" class="wt-formtheme wt-formregister" id="verification_form">
-                                    <div class="wt-registerhead">
-                                        <div class="wt-title">
-                                            <h3>{{{ $reg_three_title }}}</h3>
-                                        </div>
-                                        <div class="wt-description">
-                                            <p>{{{ $reg_three_subtitle }}}</p>
-                                        </div>
+                                    <div class="wt-haslayout" v-if="step === 2" v-cloak>
+                                        <fieldset class="wt-registerformgroup">
+                                            <div class="wt-registerhead">
+                                                <div class="wt-title">
+                                                    <h3>{{{ $reg_two_title }}}</h3>
+                                                </div>
+                                                @if (!empty($reg_two_subtitle))
+                                                    <div class="wt-description">
+                                                        <p>{{{ $reg_two_subtitle }}}</p>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <ul class="wt-joinsteps">
+                                                <li class="wt-done-next"><a href="javascrip:void(0);"><i class="fa fa-check"></i></a></li>
+                                                <li class="wt-active"><a href="javascrip:void(0);">{{{ trans('lang.02') }}}</a></li>
+                                                <li><a href="javascrip:void(0);">{{{ trans('lang.03') }}}</a></li>
+                                                <li><a href="javascrip:void(0);">{{{ trans('lang.04') }}}</a></li>
+                                            </ul>
+                                            @if (!empty($locations))
+                                                <div class="form-group">
+                                                    <span class="wt-select">
+                                                        {!! Form::select('locations', $locations, null, array('placeholder' => trans('lang.select_locations'), 'v-bind:class' => '{ "is-invalid": form_step2.is_locations_error }')) !!}
+                                                        <span class="help-block" v-if="form_step2.locations_error">
+                                                            <strong v-cloak>@{{form_step2.locations_error}}</strong>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            @endif
+                                            <div class="form-group form-group-half">
+                                                <input id="password" type="password" class="form-control" name="password" placeholder="{{{ trans('lang.ph_pass') }}}" v-bind:class="{ 'is-invalid': form_step2.is_password_error }">
+                                                <span class="help-block" v-if="form_step2.password_error">
+                                                    <strong v-cloak>@{{form_step2.password_error}}</strong>
+                                                </span>
+                                            </div>
+                                            <div class="form-group form-group-half">
+                                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" placeholder="{{{ trans('lang.ph_retry_pass') }}}" v-bind:class="{ 'is-invalid': form_step2.is_password_confirm_error }">
+                                                <span class="help-block" v-if="form_step2.password_confirm_error">
+                                                    <strong v-cloak>@{{form_step2.password_confirm_error}}</strong>
+                                                </span>
+                                            </div>
+                                        </fieldset>
+                                        <fieldset class="wt-formregisterstart">
+                                            <div class="wt-title wt-formtitle">
+                                                <h4>{{{ trans('lang.start_as') }}}</h4>
+                                            </div>
+                                            @if(!empty($roles))
+                                                <ul class="wt-accordionhold wt-formaccordionhold accordion">
+                                                    @foreach ($roles as $key => $role)
+                                                        @if (!in_array($role['id'] == 1, $roles))
+                                                            <li v-bind:class="{ 'role-is-invalid': form_step2.is_role_error }">
+                                                                <div class="wt-accordiontitle" id="headingOne" data-toggle="collapse" data-target="#collapseOne">
+                                                                    <span class="wt-radio">
+                                                                    <input id="wt-company-{{$key}}" type="radio" name="role" value="{{{ $role['role_type'] }}}" checked="" v-model="user_role" v-on:change="selectedRole(user_role)">
+                                                                    <label for="wt-company-{{$key}}">
+                                                                        {{ $role['name'] === 'freelancer' ? trans('lang.freelancer') : trans('lang.employer')}}
+                                                                        <span> 
+                                                                            ({{ $role['name'] === 'freelancer' ? trans('lang.signup_as_freelancer') : trans('lang.signup_as_country')}})
+                                                                        </span>
+                                                                    </label>
+                                                                    </span>
+                                                                </div>
+                                                                @if ($role['role_type'] === 'employer')
+                                                                    @if ($show_emplyr_inn_sec === 'true')
+                                                                        <div class="wt-accordiondetails collapse show" id="collapseOne" aria-labelledby="headingOne" v-if="is_show">
+                                                                            <div class="wt-radioboxholder">
+                                                                                <div class="wt-title">
+                                                                                    <h4>{{{ trans('lang.no_of_employees') }}}</h4>
+                                                                                </div>
+                                                                                @foreach ($employees as $key => $employee)
+                                                                                    <span class="wt-radio">
+                                                                                        <input id="wt-just-{{{$key}}}" type="radio" name="employees" value="{{{$employee['value']}}}" checked="">
+                                                                                        <label for="wt-just-{{{$key}}}">{{{$employee['title']}}}</label>
+                                                                                    </span>
+                                                                                @endforeach
+                                                                            </div>
+                                                                            @if ($departments->count() > 0)
+                                                                                <div class="wt-radioboxholder">
+                                                                                    <div class="wt-title">
+                                                                                        <h4>{{{ trans('lang.your_department') }}}</h4>
+                                                                                    </div>
+                                                                                    @foreach ($departments as $key => $department)
+                                                                                        <span class="wt-radio">
+                                                                                            <input id="wt-department-{{{$department->id}}}" type="radio" name="department" value="{{{$department->id}}}" checked="">
+                                                                                            <label for="wt-department-{{{$department->id}}}">{{{$department->title}}}</label>
+                                                                                        </span>
+                                                                                    @endforeach
+                                                                                </div>
+                                                                                <div class="form-group wt-othersearch d-none">
+                                                                                    <input type="text" name="department_name" class="form-control" placeholder="{{{ trans('lang.enter_department') }}}">
+                                                                                </div>
+                                                                            @endif
+                                                                        </div>
+                                                                    @endif    
+                                                                @endif
+                                                            </li>
+                                                        @endif
+                                                    @endforeach
+                                                </ul>
+                                                <span class="help-block" v-if="form_step2.role_error">
+                                                    <strong v-cloak>@{{form_step2.role_error}}</strong>
+                                                </span>
+                                            @endif
+                                        </fieldset>
+                                        <fieldset class="wt-termsconditions">
+                                            <div class="wt-checkboxholder">
+                                                <span class="wt-checkbox">
+                                                    <input id="termsconditions" type="checkbox" name="termsconditions" checked="">
+                                                    <label for="termsconditions"><span>{{{ $term_note }}}</span></label>
+                                                    <span class="help-block" v-if="form_step2.termsconditions_error">
+                                                        <strong style="color: red;" v-cloak>{{trans('lang.register_termsconditions_error')}}</strong>
+                                                    </span>
+                                                </span>
+                                                <a href="#" @click.prevent="prev()" class="wt-btn">{{{ trans('lang.previous') }}}</a>
+                                                <a href="#" @click.prevent="checkStep2('{{ trans('lang.email_not_config') }}')" class="wt-btn">{{{ trans('lang.continue') }}}</a>
+                                            </div>
+                                        </fieldset>
                                     </div>
+                                </form>
+                                <div class="wt-joinformc" v-if="step === 3" v-cloak>
+                                    <form method="POST" action="" class="wt-formtheme wt-formregister" id="verification_form">
+                                        <div class="wt-registerhead">
+                                            <div class="wt-title">
+                                                <h3>{{{ $reg_three_title }}}</h3>
+                                            </div>
+                                            <div class="wt-description">
+                                                <p>{{{ $reg_three_subtitle }}}</p>
+                                            </div>
+                                        </div>
+                                        <ul class="wt-joinsteps">
+                                            <li class="wt-done-next"><a href="javascrip:void(0);"><i class="fa fa-check"></i></a></li>
+                                            <li class="wt-done-next"><a href="javascrip:void(0);"><i class="fa fa-check"></i></a></li>
+                                            <li class="wt-active"><a href="javascrip:void(0);">{{{ trans('lang.03') }}}</a></li>
+                                            <li><a href="javascrip:void(0);">{{{ trans('lang.04') }}}</a></li>
+                                        </ul>
+                                        <figure class="wt-joinformsimg">
+                                            <img src="{{ asset($register_image)}}" alt="{{{ trans('lang.verification_code_img') }}}">
+                                        </figure>
+                                        <fieldset>
+                                            <div class="form-group">
+                                                <label>
+                                                    {{{ trans('lang.verify_code_note') }}}
+                                                    @if (!empty($reg_page))
+                                                        <a target="_blank" href="{{{url($reg_page)}}}">
+                                                            {{{ trans('lang.why_need_code') }}}
+                                                        </a>
+                                                    @else
+                                                        <a href="javascript:void(0)">
+                                                            {{{ trans('lang.why_need_code') }}}
+                                                        </a>
+                                                    @endif
+                                                </label>
+                                                <input type="text" name="code" class="form-control" placeholder="{{{ trans('lang.enter_code') }}}">
+                                            </div>
+                                            <div class="form-group wt-btnarea">
+                                                <a href="#" @click.prevent="verifyCode()" class="wt-btn">{{{ trans('lang.continue') }}}</a>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+                                </div>
+                                <div class="wt-gotodashboard" v-if="step === 4" v-cloak>
                                     <ul class="wt-joinsteps">
                                         <li class="wt-done-next"><a href="javascrip:void(0);"><i class="fa fa-check"></i></a></li>
                                         <li class="wt-done-next"><a href="javascrip:void(0);"><i class="fa fa-check"></i></a></li>
-                                        <li class="wt-active"><a href="javascrip:void(0);">{{{ trans('lang.03') }}}</a></li>
-                                        <li><a href="javascrip:void(0);">{{{ trans('lang.04') }}}</a></li>
+                                        <li class="wt-done-next"><a href="javascrip:void(0);"><i class="fa fa-check"></i></a></li>
+                                        <li class="wt-done-next"><a href="javascrip:void(0);"><i class="fa fa-check"></i></a></li>
                                     </ul>
-                                    <figure class="wt-joinformsimg">
-                                        <img src="{{ asset($register_image)}}" alt="{{{ trans('lang.verification_code_img') }}}">
-                                    </figure>
-                                    <fieldset>
-                                        <div class="form-group">
-                                            <label>
-                                                {{{ trans('lang.verify_code_note') }}}
-                                                @if (!empty($reg_page))
-                                                    <a target="_blank" href="{{{url($reg_page)}}}">
-                                                        {{{ trans('lang.why_need_code') }}}
-                                                    </a>
-                                                @else
-                                                    <a href="javascript:void(0)">
-                                                        {{{ trans('lang.why_need_code') }}}
-                                                    </a>
-                                                @endif
-                                            </label>
-                                            <input type="text" name="code" class="form-control" placeholder="{{{ trans('lang.enter_code') }}}">
+                                    <div class="wt-registerhead">
+                                        <div class="wt-title">
+                                            <h3>{{{ $reg_four_title }}}</h3>
                                         </div>
-                                        <div class="form-group wt-btnarea">
-                                            <a href="#" @click.prevent="verifyCode()" class="wt-btn">{{{ trans('lang.continue') }}}</a>
+                                        <div class="description">
+                                            <p>{{{ $reg_four_subtitle }}}</p>
                                         </div>
-                                    </fieldset>
-                                </form>
-                            </div>
-                            <div class="wt-gotodashboard" v-if="step === 4" v-cloak>
-                                <ul class="wt-joinsteps">
-                                    <li class="wt-done-next"><a href="javascrip:void(0);"><i class="fa fa-check"></i></a></li>
-                                    <li class="wt-done-next"><a href="javascrip:void(0);"><i class="fa fa-check"></i></a></li>
-                                    <li class="wt-done-next"><a href="javascrip:void(0);"><i class="fa fa-check"></i></a></li>
-                                    <li class="wt-done-next"><a href="javascrip:void(0);"><i class="fa fa-check"></i></a></li>
-                                </ul>
-                                <div class="wt-registerhead">
-                                    <div class="wt-title">
-                                        <h3>{{{ $reg_four_title }}}</h3>
                                     </div>
-                                    <div class="description">
-                                        <p>{{{ $reg_four_subtitle }}}</p>
-                                    </div>
+                                    <a href="#" class="wt-btn" @click.prevent="loginRegisterUser()">{{{ trans('lang.goto_dashboard') }}}</a>
                                 </div>
-                                <a href="#" class="wt-btn" @click.prevent="loginRegisterUser()">{{{ trans('lang.goto_dashboard') }}}</a>
-                            </div>
+                            @endif
                         </div>
                     </div>
                     <div class="wt-registerformfooter">

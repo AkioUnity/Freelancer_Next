@@ -4,11 +4,13 @@
       :id="id"
       :useCustomSlot="true"
       :ref="img_ref"
+      :destroyDropzone="false"
       v-on:vdropzone-error="failed"
       v-on:vdropzone-thumbnail="validateDimentation"
       v-on:vdropzone-file-added="addedFile"
       v-on:vdropzone-removed-file="removedFile"
       v-on:vdropzone-queue-complete="successUpload"
+      v-on:vdropzone-success="imageUploadSuccess"
       :class="'at-profile-setting__uploadarea'"
     >
         <div class="form-group form-group-label">
@@ -143,6 +145,9 @@ export default {
     successUpload: function() {
       this.$emit("addedSuccess", 'file-add')  
     },
+    imageUploadSuccess: function () {
+      this.$emit("addedFile", 'file-add')  
+    },
     addedFile: function(file) {
       let parentClass = this.$refs[this.img_ref].id;
       parent = document.getElementById(this.parent_id)
@@ -168,7 +173,7 @@ export default {
           input.setAttribute("value", file.name);
           input.setAttribute("id", this.hidden_input_id+'-'+i);
         }
-        this.$emit("addedFile", 'file-add')  
+        // this.$emit("addedFile", 'file-add')  
       }
       var listParent = document.getElementById(file.previewElement.id)
       listParent.appendChild(input);

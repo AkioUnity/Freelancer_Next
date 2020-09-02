@@ -301,10 +301,16 @@ class PageController extends Controller
                 $page_banner = SiteManagement::where('meta_key', 'page-banner-' . $id)->select('meta_value')->pluck('meta_value')->first();
                 $page['banner'] = !empty($page_banner) ? $page_banner : '';
                 $page['banner_detail'] = !empty($page_banner) ? Helper::getImageDetail($page_banner, 'uploads/pages/' . $id) : '';
-                if (!empty($child_parent_id->parent_id)) {
-                    $parent_selected_id = $child_parent_id->parent_id;
-                } else {
-                    $parent_selected_id = '';
+                $page['parent_type'] = !empty($selected_page->metaValue('parent_type')) ? $selected_page->metaValue('parent_type')['meta_value'] : '';
+                if ($page['parent_type'] == 'custom_link') {
+                    $parent_selected_id =!empty($selected_page->metaValue('custom_link')) ? $selected_page->metaValue('custom_link')['meta_value'] : '';
+                }
+                if ($page['parent_type'] == 'page') {
+                    if (!empty($child_parent_id->parent_id)) {
+                        $parent_selected_id = $child_parent_id->parent_id;
+                    } else {
+                        $parent_selected_id = '';
+                    }
                 }
                 $app_style_list = Helper::getAppStyleList();
                 $slider_style_list = Helper::getSliderStyleList();
@@ -557,6 +563,7 @@ class PageController extends Controller
                 $page['header'] = !empty($selected_page->metaValue('header')) ? $selected_page->metaValue('header')['meta_value'] : '';
                 $page['footer'] = !empty($selected_page->metaValue('footer')) ? $selected_page->metaValue('footer')['meta_value'] : '';
                 $page['page_order'] = !empty($selected_page->metaValue('page_order')) ? $selected_page->metaValue('page_order')['meta_value'] : '';
+                $page['parent_type'] = !empty($selected_page->metaValue('parent_type')) ? $selected_page->metaValue('parent_type')['meta_value'] : '';
                 $page['header_styling'] = !empty($selected_page->metaValue('header_styling')) ? unserialize($selected_page->metaValue('header_styling')['meta_value']) : '';
                 $page['show_page_navbar'] = SiteManagement::where('meta_key', 'show-page-' . $selected_page->id)->select('meta_value')->pluck('meta_value')->first();
                 $meta_title = SiteManagement::where('meta_key', 'meta-title-' . $id)->select('meta_value')->pluck('meta_value')->first();
@@ -598,7 +605,8 @@ class PageController extends Controller
                 $section_index = preg_match_all('!\d+!', $meta['meta_key'], $matches);
                 if (
                     $meta['meta_key'] !== 'title' && $meta['meta_key'] !== 'header' && 
-                    $meta['meta_key'] !== 'footer' && $meta['meta_key'] !== 'page_order'
+                    $meta['meta_key'] !== 'footer' && $meta['meta_key'] !== 'page_order' && 
+                    $meta['meta_key'] !== 'parent_type' && $meta['meta_key'] !== 'custom_link'
                 ) {
                     $prepare_array[$meta_key_modify][$count] = Helper::getUnserializeData($meta['meta_value'] . $section_index);
                 }
@@ -621,6 +629,27 @@ class PageController extends Controller
         $json = array();
         $child_pages = DB::table('child_pages')->select('child_id')->get()->pluck('child_id')->toArray();
         $pages = Page::select('id', 'title')->whereNotIn('id', $child_pages)->get()->toArray();
+        $show_pages_list = array();
+        $count = 0;
+        foreach ($pages as $key => $page) {
+            $enable_page = SiteManagement::where('meta_key', 'show-page-' . $page['id'])->select('meta_value')->pluck('meta_value')->first();
+            if (!empty($enable_page) && $enable_page == true) {
+                $show_pages_list[$count] = $page;
+                $show_pages_list[$count]['type'] = 'pages';
+                $count++;
+            }
+        }
+        $menu_settings = !empty(SiteManagement::getMetaValue('menu_settings')) ? SiteManagement::getMetaValue('menu_settings') : array();
+        if (!empty($menu_settings['custom_links'])) {
+            foreach ($menu_settings['custom_links'] as $key => $custom_menu) {
+                if ($custom_menu['relation_type'] == 'parent') {
+                    $show_pages_list[$count]['id'] = $custom_menu['custom_slug'];
+                    $show_pages_list[$count]['title'] = $custom_menu['custom_title'];
+                    $show_pages_list[$count]['type'] = 'custom_menu';
+                    $count++;
+                }
+            }
+        }
         $inner_pages = array( 
             '0' => array(
                 'id' => 'freelancers',
@@ -649,11 +678,11 @@ class PageController extends Controller
             ),
         );
         foreach ($inner_pages as $innerPage) {
-            array_push($pages, $innerPage);
+            array_push($show_pages_list, $innerPage);
         }
-        if (!empty($pages)) {
+        if (!empty($show_pages_list)) {
             $json['type'] = 'success';
-            $json['pages'] = $pages;
+            $json['pages'] = $show_pages_list;
             return $json;
         } else {
             $json['type'] = 'error';

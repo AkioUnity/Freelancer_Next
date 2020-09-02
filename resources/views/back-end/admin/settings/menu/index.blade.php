@@ -24,6 +24,11 @@
             <h2>{{{ trans('lang.pages_order') }}}</h2>
         </div>
         <page-order></page-order>
+        {{-- Custom Link Component --}}
+        <div class="wt-tabscontenttitle">
+            <h2>{{{ trans('lang.custom_links') }}}</h2>
+        </div>
+        <custom-link></custom-link>
     </div>
     <div class="wt-updatall la-updateall-holder">
         <i class="ti-announcement"></i>

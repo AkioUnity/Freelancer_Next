@@ -90,6 +90,52 @@
             </div>
         </div>
     </div>
+    <div class="wt-tabscontenttitle">
+        <h2>{{{ trans('lang.price_range') }}}</h2>
+    </div>
+    <div class="wt-settingscontent">
+        <div class="wt-formtheme wt-userform">
+            <div class="form-group">
+                {!! Form::text('settings[0][price_range]', e($price_range), array('class' => 'form-control', 'placeholder'=>trans('lang.max_price_range'))) !!}
+            </div>
+        </div>
+    </div>
+    {{-- Loader --}}
+    <div class="wt-securitysettings wt-tabsinfo wt-haslayout">
+        <div class="wt-tabscontenttitle">
+            <h2>{{{ trans('lang.loader') }}}</h2>
+        </div>
+        <div class="wt-settingscontent">
+            <div class="wt-description">
+                <p>{{{ trans('lang.enable_disable_loader_note') }}}</p>
+            </div>
+            <ul class="wt-accountinfo">
+                <li>
+                    <switch_button v-model="enable_loader">{{{ trans('lang.enable_disable_loader') }}}</switch_button>
+                    <input type="hidden" :value="enable_loader" name="settings[0][enable_loader]">
+                </li>
+            </ul>
+        </div>
+    </div>
+    {{-- Loader end --}}
+    {{-- Freelancer earning --}}
+    <div class="wt-securitysettings wt-tabsinfo wt-haslayout">
+        <div class="wt-tabscontenttitle">
+            <h2>{{{ trans('lang.freelancer_earnings') }}}</h2>
+        </div>
+        <div class="wt-settingscontent">
+            <div class="wt-description">
+                <p>{{{ trans('lang.show_hide_freelancer_earnings_note') }}}</p>
+            </div>
+            <ul class="wt-accountinfo">
+                <li>
+                    <switch_button v-model="show_earnings">{{{ trans('lang.show_hide_freelancer_earning') }}}</switch_button>
+                    <input type="hidden" :value="show_earnings" name="settings[0][show_earnings]">
+                </li>
+            </ul>
+        </div>
+    </div>
+    {{-- Freelancer end --}}
     <div class="wt-securitysettings wt-tabsinfo wt-haslayout">
         <div class="wt-tabscontenttitle">
             <h2>{{{ trans('lang.chat_setting') }}}</h2>

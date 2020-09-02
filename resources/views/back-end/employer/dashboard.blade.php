@@ -195,7 +195,7 @@
                                         @foreach ($ongoing_jobs as $project)
                                             @php
                                                 $proposal_freelancer = $project->proposals->where('status', 'hired')->pluck('freelancer_id')->first();
-                                                $freelancer = !empty($proposal_freelancer) ? \App\User::find($proposal_freelancer) : '';
+                                                $freelancer = !empty($proposal_freelancer) ? \App\User::find($proposal_freelancer) : ''; 
                                                 $user_name = Helper::getUsername($proposal_freelancer);
                                             @endphp
                                             <tr>
@@ -226,9 +226,9 @@
                                 </table>
                             </div>
                         @else
-                            @if (file_exists(resource_path('views/extend/errors/no-record.blade.php')))
+                            @if (file_exists(resource_path('views/extend/errors/no-record.blade.php'))) 
                                 @include('extend.errors.no-record')
-                            @else
+                            @else 
                                 @include('errors.no-record')
                             @endif
                         @endif

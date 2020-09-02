@@ -124,7 +124,7 @@
                                     <fieldset>
                                         <div class="form-group">
                                             <span class="wt-select">
-                                                {!! Form::select('completion_time', $job_completion_time, e($job_completion_time['weekly']), array('v-model'=>'proposal.completion_time', 'placeholder' => trans('lang.ph_job_completion_time') )) !!}
+                                                {!! Form::select('completion_time', $job_completion_time, null, array('v-model'=>'proposal.completion_time', 'placeholder' => trans('lang.ph_job_completion_time') )) !!}
                                             </span>
                                         </div>
                                         <div class="form-group">

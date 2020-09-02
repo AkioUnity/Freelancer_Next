@@ -295,7 +295,7 @@ class User extends Authenticatable
      *
      * @return \Illuminate\Http\Response
      */
-    public function storeUser($request, $verification_code)
+    public function storeUser($request, $verification_code, $registration_type = '', $verification_type = '')
     {
         if (!empty($request)) {
             $this->first_name = filter_var($request['first_name'], FILTER_SANITIZE_STRING);
@@ -304,8 +304,17 @@ class User extends Authenticatable
                 filter_var($request['last_name'], FILTER_SANITIZE_STRING);
             $this->email = filter_var($request['email'], FILTER_VALIDATE_EMAIL);
             $this->password = Hash::make($request['password']);
-            $this->verification_code = $verification_code;
-            $this->user_verified = 0;
+            if ($registration_type !== 'single' && $verification_type !== 'auto_verify') {
+                $this->verification_code = $verification_code;
+                $this->user_verified = 0;
+            } else if ($registration_type == 'single' && $verification_type == 'auto_verify') {
+                $this->verification_code = null;
+                $this->user_verified = 1;
+            
+            } else if ($registration_type == 'single' && $verification_type == 'admin_verify') {
+                $this->verification_code = null;
+                $this->user_verified = 0;
+            }    
             $this->assignRole($request['role']);
             if (!empty($request['locations'])) {
                 $location = Location::find($request['locations']);

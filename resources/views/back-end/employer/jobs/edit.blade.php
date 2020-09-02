@@ -102,7 +102,7 @@
                                         <job_skills :placeholder="'select skills'"></job_skills>
                                     </div>
                                 </div>
-                                <div class="wt-jobskills wt-tabsinfo la-location-edit">
+                                <div class="wt-joblocation wt-tabsinfo la-location-edit">
                                     <div class="wt-tabscontenttitle">
                                         <h2>{{ trans('lang.your_loc') }}</h2>
                                     </div>
@@ -114,21 +114,17 @@
                                                     </span>
                                             </div>
                                             <div class="form-group form-group-half">
-                                                {!! Form::text( 'address', $job->address, ['class' =>'form-control', 'placeholder' => trans('lang.your_address')] ) !!}
+                                                {!! Form::text( 'address', $job->address, ['id'=>"pac-input", 'class' =>'form-control', 'placeholder' => trans('lang.your_address')] ) !!}
                                             </div>
-                                            @if (!empty($job->latitude) && !empty($job->longitude))
-                                                <div class="form-group wt-formmap">
-                                                    <div class="wt-locationmap">
-                                                        <custom-map :latitude="{{ $job->latitude }}" :longitude="{{ $job->longitude }}"></custom-map>
-                                                    </div>
-                                                </div>
-                                            @endif
+                                            <div class="form-group wt-formmap">
+                                                @include('includes.map')
+                                            </div>
                                             <div class="form-group form-group-half">
-                                                {!! Form::text( 'longitude', $job->longitude, ['class' =>'form-control', 'placeholder' => trans('lang.enter_logitude')])
+                                                {!! Form::text( 'longitude', $job->longitude, ['id'=>"lng-input", 'class' =>'form-control', 'placeholder' => trans('lang.enter_logitude')])
                                                 !!}
                                             </div>
                                             <div class="form-group form-group-half">
-                                                {!! Form::text( 'latitude', $job->latitude, ['class' =>'form-control', 'placeholder' => trans('lang.enter_latitude')]) !!}
+                                                {!! Form::text( 'latitude', $job->latitude, ['id'=>"lat-input", 'class' =>'form-control', 'placeholder' => trans('lang.enter_latitude')]) !!}
                                             </div>
                                         </fieldset>
                                     </div>

@@ -72,7 +72,8 @@ class Review extends Model
         $freelancer_rating = $freelancer_total_rating / Self::where('receiver_id', $request['receiver_id'])->count();
         if (!empty($freelancer_rating)) {
             $rating = array();
-            $freelancer_profile = Profile::find($request['receiver_id']);
+            $profile = Profile::select('id')->where('user_id', $request['receiver_id'])->first();
+            $freelancer_profile = Profile::find($profile->id);
             $rating = unserialize($freelancer_profile->rating);
             $rating = !empty($rating) && is_array($rating) ? $rating : array();
             $rating[] = round($freelancer_rating);

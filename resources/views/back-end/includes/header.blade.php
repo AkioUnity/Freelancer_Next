@@ -46,6 +46,9 @@
             .wt-header .wt-navigationarea .wt-userlogedin .wt-username h3 {color: {{$menu_text_color}} };
         </style>
     @endpush
+    @auth
+        {{Helper::displayVerificationWarning()}}
+    @endauth
     @if (!empty($slider) && $slider['index'] == 0) 
         @if (!empty($slider['style']) && $slider['style'] == 'style3')
             <header id="wt-header" class="wt-header wt-headervfour wt-haslayout">

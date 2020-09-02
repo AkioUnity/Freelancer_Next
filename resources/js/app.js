@@ -56,6 +56,7 @@ window.flashMessageVue = new Vue();
 Vue.use(datePicker);
 Vue.use(BootstrapVue);
 
+
 Vue.component('verte', Verte);
 Vue.component('upload-file', require('./components/UploadFileComponent.vue').default);
 Vue.component('upload-image', require('./components/UploadImageComponent.vue').default);
@@ -98,12 +99,14 @@ Vue.component('show-page', require('./components/pageBuilder/show/index.vue').de
 Vue.component('second-slider', require('./components/pages/show/sections/sliders/style2.vue').default);
 Vue.component('third-slider', require('./components/pages/show/sections/sliders/style3.vue').default);
 Vue.component('page-media', require('./components/PageAttachmentComponent.vue').default)
-
+Vue.component('custom-link', require('./components/CustomLinkComponent.vue').default);
 // New page Builder
 Vue.component('create-new-page', require('./components/pages/create.vue').default);
 Vue.component('edit-new-page', require('./components/pages/edit.vue').default);
 Vue.component('show-new-page', require('./components/pages/show/show.vue').default);
 Vue.component('search-form-v2', require('./components/SearchComponentV2.vue').default);
+
+Vue.component('slider-skeleton', require('./components/pages/show/skeleton/slider.vue').default);
 // end new page builder
 jQuery(document).ready(function () {
     jQuery(document).on('click', '.wt-back', function (e) {
@@ -259,8 +262,14 @@ if (document.getElementById("wt-innerbannerholdertwo")) {
 if (document.getElementById("slider")) {
     const vmHeader = new Vue({
         el: '#slider',
-        mounted: function () {
-            
+        data: {
+            sliderSkeleton:true
+        },
+        mounted  () {
+            var self = this
+            setTimeout(() => {
+                self.sliderSkeleton = false
+            }, 2000);
         },
     });
 }
@@ -434,6 +443,63 @@ if (document.getElementById("registration")) {
                 }
                 console.log(role);
             },
+            checkSingleForm: function (error_message) {
+                this.error_message = error_message
+                this.loading = true
+                this.form_step1.first_name_error = '';
+                this.form_step1.is_first_name_error = false;
+                this.form_step1.last_name_error = '';
+                this.form_step1.is_last_name_error = false;
+                this.form_step1.email_error = '';
+                this.form_step1.is_email_error = false;
+                this.form_step2.password_error = '';
+                this.form_step2.is_password_error = false;
+                this.form_step2.password_confirm_error = '';
+                this.form_step2.is_password_confirm_error = false;
+                this.form_step2.termsconditions_error = '';
+                this.form_step2.is_termsconditions_error = false;
+                this.form_step2.role = '';
+                this.form_step2.is_role = false;
+                var self = this
+                let registerForm = document.getElementById('register_form')
+                let formData = new FormData(registerForm)
+                axios.post(APP_URL + '/register/single-form-custom-errors', formData)
+                    .then(function (response) {
+                        self.loading = false
+                        self.submitUser('single')
+                    })
+                    .catch(function (error) {
+                        self.loading = false
+                        if (error.response.data.errors.first_name) {
+                            self.form_step1.first_name_error = error.response.data.errors.first_name[0];
+                            self.form_step1.is_first_name_error = true;
+                        }
+                        if (error.response.data.errors.last_name) {
+                            self.form_step1.last_name_error = error.response.data.errors.last_name[0];
+                            self.form_step1.is_last_name_error = true;
+                        }
+                        if (error.response.data.errors.email) {
+                            self.form_step1.email_error = error.response.data.errors.email[0];
+                            self.form_step1.is_email_error = true;
+                        }
+                        if (error.response.data.errors.password) {
+                            self.form_step2.password_error = error.response.data.errors.password[0];
+                            self.form_step2.is_password_error = true;
+                        }
+                        if (error.response.data.errors.password_confirmation) {
+                            self.form_step2.password_confirm_error = error.response.data.errors.password_confirmation[0];
+                            self.form_step2.is_password_confirm_error = true;
+                        }
+                        if (error.response.data.errors.termsconditions) {
+                            self.form_step2.termsconditions_error = error.response.data.errors.termsconditions[0];
+                            self.form_step2.is_termsconditions_error = true;
+                        }
+                        if (error.response.data.errors.role) {
+                            self.form_step2.role_error = error.response.data.errors.role[0];
+                            self.form_step2.is_role_error = true;
+                        }
+                    })
+            },
             checkStep1: function (e) {
                 this.form_step1.first_name_error = '';
                 this.form_step1.is_first_name_error = false;
@@ -478,7 +544,7 @@ if (document.getElementById("registration")) {
                 var self = this;
                 axios.post(APP_URL + '/register/form-step2-custom-errors', form_data).
                     then(function (response) {
-                        self.submitUser();
+                        self.submitUser('multiple')
                     })
                     .catch(function (error) {
                         if (error.response.data.errors.password) {
@@ -499,13 +565,15 @@ if (document.getElementById("registration")) {
                         }
                     });
             },
-            submitUser: function () {
+            submitUser: function (formType) {
                 this.loading = true;
                 let register_Form = document.getElementById('register_form');
                 let form_data = new FormData(register_Form);
-                form_data.append('email', this.user_email);
-                form_data.append('first_name', this.first_name);
-                form_data.append('last_name', this.last_name);
+                if (formType == 'multiple') {
+                    form_data.append('email', this.user_email);
+                    form_data.append('first_name', this.first_name);
+                    form_data.append('last_name', this.last_name);
+                }
                 var self = this;
                 axios.post(APP_URL + '/register', form_data)
                     .then(function (response) {
@@ -515,7 +583,11 @@ if (document.getElementById("registration")) {
                             if (response.data.email == 'not_configured') {
                                 window.location.replace(response.data.url);
                             } else {
-                                self.next();
+                                if (formType == 'single') {
+                                    self.loginRegisterUser()
+                                } else if (formType == 'multiple') {
+                                    self.next();
+                                }
                             }
                         } else if (response.data.type == 'error') {
                             self.loading = false;
@@ -1953,6 +2025,8 @@ if (document.getElementById("settings")) {
             home_section_display: false,
             show_services_section: true,
             chat_display: false,
+            enable_loader: false,
+            show_earnings: false,
             app_section_display: false,
             uploaded_logo: false,
             uploaded_banner: false,
@@ -1983,6 +2057,7 @@ if (document.getElementById("settings")) {
             reg_form_banner: false,
             success_message: '',
             colorSettings:true,
+            reg_form_type: 'multiple',
             notificationSystem: {
                 options: {
                     success: {
@@ -2114,6 +2189,16 @@ if (document.getElementById("settings")) {
                             self.chat_display = true;
                         } else {
                             self.chat_display = false;
+                        }
+                        if ((response.data.enable_loader == 'true')) {
+                            self.enable_loader = true;
+                        } else {
+                            self.enable_loader = false;
+                        }
+                        if ((response.data.show_earnings == 'true')) {
+                            self.show_earnings = true;
+                        } else {
+                            self.show_earnings = false;
                         }
                     });
             },
@@ -2578,8 +2663,6 @@ if (document.getElementById("settings")) {
                     confirmButtonClass: "btn-danger",
                     confirmButtonText: "Yes",
                     cancelButtonText: "No",
-                    closeOnConfirm: true,
-                    closeOnCancel: true,
                     showLoaderOnConfirm: true
                 }).then((result) => {
                     var self = this;
@@ -2589,7 +2672,7 @@ if (document.getElementById("settings")) {
                             .then(function (response) {
                                 if (response.data.type == "success") {
                                     self.loading = false;
-                                    self.$swal(Vue.prototype.trans(lang.deleted), Vue.prototype.trans(lang.cache_cleared), Vue.prototype.trans(lang.success))
+                                    self.$swal(Vue.prototype.trans('lang.deleted'), Vue.prototype.trans('lang.cache_cleared'), Vue.prototype.trans('lang.success'))
                                 } else {
                                     self.loading = false;
                                 }
@@ -2609,18 +2692,15 @@ if (document.getElementById("settings")) {
                     confirmButtonClass: "btn-danger",
                     confirmButtonText: "Yes",
                     cancelButtonText: "No",
-                    closeOnConfirm: true,
-                    closeOnCancel: true,
-                    showLoaderOnConfirm: true
                 }).then((result) => {
                     var self = this;
-                    self.loading = true;
                     if (result.value) {
+                        self.loading = true;
                         axios.get(APP_URL + '/admin/clear-allcache')
                             .then(function (response) {
                                 if (response.data.type == "success") {
                                     self.loading = false;
-                                    self.$swal(Vue.prototype.trans(lang.cleared), Vue.prototype.trans(lang.cache_cleared), Vue.prototype.trans(lang.success))
+                                    self.$swal(Vue.prototype.trans('lang.cleared'), Vue.prototype.trans('lang.cache_cleared'), Vue.prototype.trans('lang.success'))
                                 } else {
                                     self.loading = false;
                                 }
@@ -2673,6 +2753,9 @@ if (document.getElementById("settings")) {
                         if (response.data.type == 'success') {
                             self.success_message = response.data.message;
                             self.showInfo(response.data.progressing);
+                            setTimeout(function () {
+                                window.location.reload()
+                            }, 4000)
                         } else if (response.data.type == 'error') {
                             self.showError(response.data.message);
                         }
@@ -2820,6 +2903,9 @@ if (document.getElementById("settings")) {
                         } else {
                             self.show_reg_form_banner = false;
                         }
+                        if (response.data.registration_type) {
+                            self.reg_form_type = response.data.registration_type;
+                        }
                     });
             },
             getSitePaymentOptions: function () {
@@ -2929,8 +3015,11 @@ if (document.getElementById("profile_settings")) {
         },
         data: function () {
             return {
+                loading: false,
+                verify_code:'',
                 profile_blocked: true,
                 profile_searchable: true,
+                code_send:true,
                 weekly_alerts: true,
                 message_alerts: false,
                 success_message: '',
@@ -2982,6 +3071,64 @@ if (document.getElementById("profile_settings")) {
             },
             showError(error) {
                 return this.$toast.error(' ', error, this.notificationSystem.options.error);
+            },
+            verifiedUserEmail: function (element_id, id, type) {
+                this.is_loading = true;
+                var self = this;
+                axios.post(APP_URL + '/admin/update/user-verify', {
+                    user_id: id,
+                    type: type
+                })
+                    .then(function (response) {
+                        self.is_loading = false;
+                        if (response.data.type === 'success') {
+                            jQuery('#' + element_id).find('a').text(response.data.status_text);
+                            self.showMessage(response.data.message);
+                            window.location.reload()
+                        }
+                    })
+                    .catch(function (error) {
+                        self.is_loading = false;
+                    })
+            },
+            reSendCode: function () {
+                this.loading = true;
+                console.log(this.loading)
+                var self = this;
+                axios.post(APP_URL + '/user/resend-verification-code')
+                    .then(function (response) {
+                        self.loading = false;
+                        if (response.data.type === 'success') {
+                            self.code_send = false
+                        } else {
+                            self.showError(response.data.message);
+                        }
+                    })
+                    .catch(function (error) {
+                        self.loading = false;
+                    })
+            },
+            verifyCode: function () {
+                this.loading = true;
+                var self = this
+                axios.post(APP_URL + '/user/verify-user-code', {
+                    code:self.verify_code
+                })
+                .then(function (response) {
+                    self.loading = false
+                    if (response.data.type === 'success') {
+                        self.showMessage(response.data.message)
+                        console.log('reloading')
+                        setTimeout(function () {
+                            window.location.replace(APP_URL + '/profile/settings/manage-account');
+                        }, 1000);
+                    } else if (response.data.type === 'error') {
+                        self.showError(response.data.message)
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error)
+                })
             },
             deleteAccount: function (event) {
                 var self = this;
@@ -3317,10 +3464,14 @@ if (document.getElementById("jobs")) {
             if (document.getElementsByClassName("flash_msg") != null) {
                 flashVue.$emit('showFlashMessage');
             }
+            if ($("body").hasClass("rtl")) {
+                this.reverse = true
+            }
         },
         created: function () {
         },
         data: {
+            reverse:false,
             refundable_user: '',
             refundable_payment_method: '',
             proposal: {
@@ -4325,6 +4476,7 @@ if (document.getElementById("invoice_list")) {
                         ids.push(obj.childNodes[c].id);
                     }
                 }
+                console.log(ids)
                 window.location.replace(APP_URL+'/admin/payouts/download/'+year+'/'+month+'/'+ids);
             }
         }
@@ -4337,11 +4489,15 @@ if (document.getElementById("services")) {
             if (document.getElementsByClassName("flash_msg") != null) {
                 flashVue.$emit('showFlashMessage');
             }
+            if ($("body").hasClass("rtl")) {
+                this.reverse = true
+            }
         },
         created: function () {
             this.getSettings();
         },
         data: {
+            reverse:false,
             report: {
                 reason: '',
                 description: '',

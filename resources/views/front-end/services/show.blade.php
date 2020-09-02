@@ -167,6 +167,7 @@
                 items : 1,
                 loop: true,
                 nav: false,
+                rtl:true,
                 dots: false,
                 autoplay: false,
                 slideSpeed : 2000,

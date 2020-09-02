@@ -256,7 +256,106 @@ class UserController extends Controller
             return view('back-end.settings.email-notifications', compact('user_email'));
         }
     }
+    
+    /**
+     * Email Verification Settings Form.
+     *
+     * @access public
+     *
+     * @return View
+     */
+    public function emailVerificationSettings()
+    {
+        if (file_exists(resource_path('views/extend/back-end/settings/email-verification.blade.php'))) {
+            return view('extend.back-end.settings.email-verification');
+        } else {
+            return view('back-end.settings.email-verification');
+        }
+    }
 
+    /**
+     * Get Verfication code
+     * 
+     * @return JSON Response
+     */
+    public function resendCode()
+    {
+        $json = array();
+        $random_number = Helper::generateRandomCode(4);
+        $verification_code = strtoupper($random_number);
+        if (Auth::user()) {
+            $user = User::find(Auth::user()->id);
+            if (empty($user->verification_code)) {
+                $user->verification_code = !empty($verification_code) ? $verification_code : null;
+                $user->save();
+            }
+            if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+                $email_params = array();
+                $template = DB::table('email_types')->select('id')
+                    ->where('email_type', 'verification_code')->get()->first();
+                if (!empty($template->id)) {
+                    $template_data = EmailTemplate::getEmailTemplateByID($template->id);
+                    $email_params['verification_code'] = $user->verification_code;
+                    $email_params['name']  = Helper::getUserName($user->id);
+                    $email_params['email'] = $user->email;
+                    Mail::to($user->email)
+                        ->send(
+                            new GeneralEmailMailable(
+                                'verification_code',
+                                $template_data,
+                                $email_params
+                            )
+                        );
+                }
+            }
+            $json['type'] = 'success';
+            return $json;
+        } else {
+            $json['type'] = 'error';
+            $json['message'] = trans('lang.email_not_config');
+            return $json;
+        }
+    }
+
+    /**
+     * Set slug before saving in DB
+     *
+     * @param \Illuminate\Http\Request $request request attributes
+     *
+     * @access public
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function reVerifyUserCode(Request $request)
+    {
+        $json = array();
+        if (Auth::user()) {
+            $user = User::find(Auth::user()->id);
+            if (!empty($request['code'])) {
+                if ($request['code'] === $user->verification_code) {
+                    $user->user_verified = 1;
+                    $user->verification_code = null;
+                    $user->save();
+                    $json['type'] = 'success';
+                    $json['message'] = trans('lang.email_verified');
+                    return $json;
+                } else {
+                    $json['type'] = 'error';
+                    $json['message'] = trans('lang.invalid_verification_code');
+                    return $json;
+                }
+            } else {
+                $json['type'] = 'error';
+                $json['message'] = trans('lang.verify_code');
+                return $json;
+            }
+        } else {
+            $json['type'] = 'error';
+            $json['message'] = trans('lang.session_expire');
+            return $json;
+        }
+    }
+    
     /**
      * Save Email Notification Settings.
      *
@@ -338,7 +437,7 @@ class UserController extends Controller
                     if (!empty($template->id)) {
                         $template_data = EmailTemplate::getEmailTemplateByID($template->id);
                         $email_params['reason'] = $delete_reason;
-                        Mail::to(env('MAIL_FROM_ADDRESS'))
+                        Mail::to(config('mail.username'))
                             ->send(
                                 new AdminEmailMailable(
                                     'admin_email_delete_account',
@@ -874,7 +973,7 @@ class UserController extends Controller
                                 $email_params['report_by_link'] = url('profile/' . $user->slug);
                                 $email_params['reported_by'] = Helper::getUserName(Auth::user()->id);
                                 $email_params['message'] = $request['description'];
-                                Mail::to(env('MAIL_FROM_ADDRESS'))
+                                Mail::to(config('mail.username'))
                                     ->send(
                                         new AdminEmailMailable(
                                             'admin_email_report_project',
@@ -893,7 +992,7 @@ class UserController extends Controller
                                 $email_params['report_by_link'] = url('profile/' . $user->slug);
                                 $email_params['reported_by'] = Helper::getUserName(Auth::user()->id);
                                 $email_params['message'] = $request['description'];
-                                Mail::to(env('MAIL_FROM_ADDRESS'))
+                                Mail::to(config('mail.username'))
                                     ->send(
                                         new AdminEmailMailable(
                                             'admin_email_report_employer',
@@ -912,7 +1011,7 @@ class UserController extends Controller
                                 $email_params['report_by_link'] = url('profile/' . $user->slug);
                                 $email_params['reported_by'] = Helper::getUserName(Auth::user()->id);
                                 $email_params['message'] = $request['description'];
-                                Mail::to(env('MAIL_FROM_ADDRESS'))
+                                Mail::to(config('mail.username'))
                                     ->send(
                                         new AdminEmailMailable(
                                             'admin_email_report_freelancer',
@@ -953,7 +1052,7 @@ class UserController extends Controller
                             } else {
                                 $template_data = '';
                             }
-                            Mail::to(env('MAIL_FROM_ADDRESS'))
+                            Mail::to(config('mail.username'))
                                 ->send(
                                     new AdminEmailMailable(
                                         'admin_email_cancel_job',
@@ -994,7 +1093,7 @@ class UserController extends Controller
                         } else {
                             $template_data = '';
                         }
-                        Mail::to(env('MAIL_FROM_ADDRESS'))
+                        Mail::to(config('mail.username'))
                             ->send(
                                 new AdminEmailMailable(
                                     'admin_email_cancel_job',
@@ -1334,12 +1433,17 @@ class UserController extends Controller
             $product_title = !empty(session()->get('product_title')) ? session()->get('product_title') : '';
             $product_price = !empty(session()->get('product_price')) ? session()->get('product_price') : '';
             $order = !empty(session()->get('order')) ? session()->get('order') : '';
+            $payment_settings = SiteManagement::getMetaValue('commision');
+            $currency_symbol  = !empty($payment_settings) && !empty($payment_settings[0]['currency']) ? Helper::currencyList($payment_settings[0]['currency']) : array();
+            $currency = !empty($currency_symbol['code']) ? $currency_symbol['code'] : 'USD';
             if (!empty($type) && !empty($product_id)) {
                 $invoice = new Invoice();
                 $invoice->title = trans('lang.bank_transfer');
                 $invoice->price = $product_price;
                 $invoice->payer_name = Helper::getUserName(Auth::user()->id);
                 $invoice->payer_email = Auth::user()->email;
+                $invoice->seller_email = '';
+                $invoice->currency_code = !empty($currency) ? $currency : 'USD';
                 $invoice->shipping_amount = 0;
                 $invoice->handling_amount = 0;
                 $invoice->insurance_amount = 0;
@@ -1748,14 +1852,24 @@ class UserController extends Controller
     public function showInvoice($id)
     {
         if (!empty($id)) {
+            $symbol = '';
+            $code = '';
             $invoice_info = DB::table('invoices')
                 ->join('items', 'items.invoice_id', '=', 'invoices.id')
                 ->select('items.*', 'invoices.*')
                 ->where('invoices.id', '=', $id)
                 ->get()->first();
-            $currency_code = !empty($invoice_info->currency_code) ? strtoupper($invoice_info->currency_code) : 'USD';
-            $code = Helper::currencyList($currency_code);
-            $symbol = !empty($code) ? $code['symbol'] : '$';
+            if (!empty($invoice_info->currency_code)) {
+                $currency_code = !empty($invoice_info->currency_code) ? strtoupper($invoice_info->currency_code) : 'USD';
+                $code = Helper::currencyList($currency_code);
+                $symbol = !empty($code) && !empty($code['symbol']) ? $code['symbol'] : '$';
+            } else {
+                $payment_settings = SiteManagement::getMetaValue('commision');
+                $currency_symbol  = !empty($payment_settings) && !empty($payment_settings[0]['currency']) ? Helper::currencyList($payment_settings[0]['currency']) : array();
+                $currency_code = !empty($currency_symbol['code']) ? $currency_symbol['code'] : 'USD';
+                $code = Helper::currencyList($currency_code);
+                $symbol = !empty($code) && !empty($code['symbol']) ? $code['symbol'] : '$';
+            }
             if (Auth::user()->getRoleNames()->first() === 'freelancer') {
                 if (file_exists(resource_path('views/extend/back-end/freelancer/invoices/show.blade.php'))) {
                     return view::make('extend.back-end.freelancer.invoices.show', compact('invoice_info', 'symbol', 'currency_code'));
@@ -2063,7 +2177,7 @@ class UserController extends Controller
                     $email_params['name'] = Helper::getUserName(Auth::user()->id);
                     $email_params['msg'] = $request['description'];
                     $email_params['reason'] = $request['reason'];
-                    Mail::to(env('MAIL_FROM_ADDRESS'))
+                    Mail::to(config('mail.username'))
                         ->send(
                             new AdminEmailMailable(
                                 'admin_email_dispute_raised',
@@ -2332,6 +2446,37 @@ class UserController extends Controller
         } else {
             $json['type'] = 'error';
             $json['message'] = trans('lang.verify_code');
+            return $json;
+        }
+    }
+
+    /**
+     * Update user verification status
+     *
+     * @param mixed $request request attributes
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function updateUserVerification(Request $request)
+    {
+        if (!empty($request['user_id'])) {
+            if ($request['type'] == 'not_verify') {
+                DB::table('users')
+                    ->where('id', $request['user_id'])
+                    ->update(['user_verified' => 0]);
+                $json['status_text'] = trans('lang.not_verified');
+            } else {
+                DB::table('users')
+                    ->where('id', $request['user_id'])
+                    ->update(['user_verified' => 1]);
+                $json['status_text'] = trans('lang.verified');
+            }
+            $json['type'] = 'success';
+            $json['message'] = trans('lang.verification_status_updated');
+            return $json;
+        } else {
+            $json['type'] = 'error';
+            $json['message'] = trans('lang.something_went_wrong');
             return $json;
         }
     }

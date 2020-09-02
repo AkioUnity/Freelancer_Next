@@ -31,11 +31,6 @@
                                         <h3><a :href="baseUrl + '/article/'+articleData.slug">{{articleData.title}}</a></h3>
                                         <span class="wt-datetime"><i class="ti-calendar"></i> {{articleData.published_date}}</span>
                                     </div>
-                                    <!-- <ul class="wt-moreoptions">
-                                        <li><a href="javascript:void(0);"><i class="ti-comment"></i> Comments</a></li>
-                                        <li><a href="javascript:void(0);"><i class="ti-eye"></i> 1,26,558</a></li>
-                                        <li><a href="javascript:void(0);" class="wt-sharelink"><i class="ti-share"></i> Share</a></li>
-                                    </ul> -->
                                 </div>
                             </div>
                         </div>

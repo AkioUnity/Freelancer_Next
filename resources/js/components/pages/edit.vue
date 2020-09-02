@@ -470,6 +470,7 @@ export default {
         id: '',
         title: '',
         sections: [],
+        parent_type:'page',
         headerStyling:{
           logo:'',
           menuColor:'',
@@ -521,7 +522,6 @@ export default {
   },
   created: function () {
     this.getPageData()
-    this.getSectionData()
     document.querySelector('body').classList.add('page-builder-body')
   },
   methods: {
@@ -544,6 +544,7 @@ export default {
             self.form.title = self.pageData.title
             self.form.slug = self.pageData.slug
             self.form.parent_id = self.selected_parent
+            self.form.parent_type = self.pageData.parent_type
             self.form.seo_desc = self.seo_desc
             self.form.body = self.pageData.body
             self.form.meta_title = self.pageData.meta_title
@@ -555,6 +556,7 @@ export default {
             self.form.show_page_banner = self.pageData.show_page_banner == 1 ? true :false
             self.form.page_banner_value = self.pageData.banner
             self.form.show_page = self.pageData.show_page_navbar == 1 ? true :false
+            self.getSectionData()
           }
         })
         .catch(function (error) { })
@@ -650,7 +652,7 @@ export default {
         .then(function (response) {
           if (response.data.type == 'success') {
             self.showMessage(self.trans('lang.page_updated'))
-            window.location.replace(APP_URL + '/admin/pages');
+            // window.location.replace(APP_URL + '/admin/pages');
           } else if (response.data.type == 'error') {
               self.showError(response.data.message);
           }
@@ -1139,6 +1141,10 @@ export default {
               videoDesc:'How it works & experience the ultimate joy.',
               videoUrl:'#',
               backgroundImg:'',
+              backgroundType:'gradient',
+              gradientStyle:'to bottom',
+              gradient1:'#934cff',
+              gradient2:'#f62b84',
               frontImg:'',
               showSearchForm:true,
               sectionColor: '#a5a5a5',
@@ -1179,7 +1185,7 @@ export default {
               title: 'Title Your Need',
               subtitle: 'We Have Everyone',
               tagline:'Looking For Professional?',
-              description: 'Edit. vue ectetur adipisicing elition sedames dotem iusmod temporei incuntes utnalo labore etdolore maina aliqua enim adion minim veniam quis nsitrud exercitation ullamco laboris nisiutaliquip ex ea commodo.',
+              description: 'Consectetur adipisicing elition sedames dotem iusmod temporei incuntes utnalo labore etdolore maina aliqua enim adion minim veniam quis nsitrud exercitation ullamco laboris nisiutaliquip ex ea commodo.',
               video_link: '',
               video_title: '',
               video_description: '',

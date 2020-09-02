@@ -14,7 +14,7 @@
                 <!-- Background Img -->
                 <div 
                     class="at-profile-setting__upload bg_img dc-settingscontent" 
-                    :id="'bg_img_wrapper'+currentElementID"
+                    :id="'bg_img_wrapper'+currentElementID" v-if="changeFound"
                 >
                     <page-media
                         :parent_id="'bg_img_wrapper'+currentElementID"
@@ -67,7 +67,7 @@
                 </div> 
                 <div 
                     class="at-profile-setting__upload first_tab_icon dc-settingscontent" 
-                    :id="'first_tab_icon_wrapper'+currentElementID"
+                    :id="'first_tab_icon_wrapper'+currentElementID" v-if="changeFound"
                 >
                     <page-media
                         :parent_id="'first_tab_icon_wrapper'+currentElementID"
@@ -120,7 +120,7 @@
                 </div> 
                 <div 
                     class="at-profile-setting__upload second_tab_icon dc-settingscontent" 
-                    :id="'second_tab_icon_wrapper'+currentElementID"
+                    :id="'second_tab_icon_wrapper'+currentElementID" v-if="changeFound"
                 >
                     <page-media
                         :parent_id="'second_tab_icon_wrapper'+currentElementID"
@@ -173,7 +173,7 @@
                 </div> 
                 <div 
                     class="at-profile-setting__upload third_tab_icon dc-settingscontent" 
-                    :id="'third_tab_icon_wrapper'+currentElementID"
+                    :id="'third_tab_icon_wrapper'+currentElementID" v-if="changeFound"
                 >
                     <page-media
                         :parent_id="'third_tab_icon_wrapper'+currentElementID"
@@ -302,6 +302,15 @@ export default {
             newFirstTabImg:false,
             newSecondTabImg:false,
             newThirdTabImg:false,
+            changeFound:true
+        }
+    },
+    watch:{
+        currentElementID: function (change) {
+            this.changeFound = false
+            setTimeout(() => {
+                this.changeFound = true
+            }, 200);
         }
     },
     methods:{
@@ -353,7 +362,7 @@ export default {
             }, 130);
         },
         imageRemoved: function(imageType) {
-            if (this.cloneElement == false) {
+            // if (this.cloneElement == false) {
                 if (imageType == 'bgImg') {
                     if (this.work.background_image) {
                         this.work.background_image = null
@@ -371,7 +380,7 @@ export default {
                         this.work.third_tab_icon = null
                     } 
                 }
-            }
+            // }
         },
         removeImage: function(imageType, hiddenID) {
             if (imageType == 'bgImg') {

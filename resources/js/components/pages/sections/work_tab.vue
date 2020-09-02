@@ -105,6 +105,7 @@ export default {
             baseUrl: APP_URL,
             tempUrl:APP_URL+'/uploads/pages/temp/',
             imageUrl:APP_URL+'/uploads/pages/'+this.pageID+'/',
+            newBgImage:false,
             newFirstTabImage:false,
             newSecondTabImage:false,
             newThirdTabImage:false
@@ -117,7 +118,7 @@ export default {
                 margin: this.work.margin ? `${this.work.margin.top}${this.work.margin.unit} ${this.work.margin.right}${this.work.margin.unit} ${this.work.margin.bottom}${this.work.margin.unit} ${this.work.margin.left}${this.work.margin.unit}` : '',
                 'text-align': this.work.alignment,
                 background: !this.work.background_image ? this.work.sectionColor : '',
-                'background-image': this.pageID ? 'url('+ this.imageUrl + this.work.background_image+')' : 'url('+ this.tempUrl + this.work.background_image+')'
+                'background-image': this.newBgImage && this.work.background_image ? 'url('+ this.tempUrl + this.work.background_image+')' : this.pageID && this.work.background_image ? 'url('+ this.imageUrl + this.work.background_image+')' : ''
             }
         },
         contentSectionStyle() {
@@ -143,6 +144,9 @@ export default {
             }, 10);
         })
 
+        Event.$on('new-bg-image'+self.element_id, (data) => {
+            this.newBgImage = true
+        })
         Event.$on('new-first-tab-image'+self.element_id, (data) => {
             this.newFirstTabImage = true
         })

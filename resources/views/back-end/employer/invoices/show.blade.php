@@ -33,7 +33,7 @@
                                         {{{trans('lang.customer_id')}}}:&nbsp;{{{$invoice_info->customer_id}}}
                                     </span>
                                 @endif
-                                <span class="wt-grossamount wt-grossamountusd">{{{ $symbol }}}{{{$invoice_info->price}}}&nbsp;{{{ strtoupper($invoice_info->currency_code) }}}</span>
+                                <span class="wt-grossamount wt-grossamountusd">{{{ $symbol }}}{{{$invoice_info->price}}}&nbsp;{{{ strtoupper($currency_code) }}}</span>
                             </li>
                             @if (!empty($invoice_info->payer_status))
                                 <li>
@@ -57,14 +57,14 @@
                                         <em>{{{$invoice_info->item_name}}}</em>
                                     </td>
                                     <td data-title="Unit Price">{{{ $invoice_info->item_qty }}}</td>
-                                    <td data-title="Total">{{ $symbol }}{{{ $invoice_info->item_price }}}&nbsp;{{ strtoupper($invoice_info->currency_code) }}</td>
-                                    <td data-title="Total">{{ $symbol }}{{{ $invoice_info->item_price }}}&nbsp;{{ strtoupper($invoice_info->currency_code) }}</td>
+                                    <td data-title="Total">{{ $symbol }}{{{ $invoice_info->item_price }}}&nbsp;{{ strtoupper($currency_code) }}</td>
+                                    <td data-title="Total">{{ $symbol }}{{{ $invoice_info->item_price }}}&nbsp;{{ strtoupper($currency_code) }}</td>
                                 </tr>
                                 <tr>
                                     <td data-title="Product Name"></td>
                                     <td data-title="Unit Price"></td>
                                     <td data-title="Unit Price">{{{trans('lang.purchase_total')}}}</td>
-                                    <td data-title="Total">{{ $symbol }}{{{ $invoice_info->item_price }}}&nbsp;{{ strtoupper($invoice_info->currency_code) }}</td>
+                                    <td data-title="Total">{{ $symbol }}{{{ $invoice_info->item_price }}}&nbsp;{{ strtoupper($currency_code) }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -81,7 +81,7 @@
                                 <tr>
                                     <td data-title="Product Name">
                                         <em>{{{trans('lang.purchase_total')}}}</em>
-                                        <span>{{ $symbol }}{{{ $invoice_info->item_price }}}&nbsp;{{ strtoupper($invoice_info->currency_code) }}</span>
+                                        <span>{{ $symbol }}{{{ $invoice_info->item_price }}}&nbsp;{{ strtoupper($currency_code) }}</span>
                                     </td>
                                     <td data-title="Unit Price"></td>
                                     <td data-title="Total"></td>
@@ -90,7 +90,7 @@
                                 <tr>
                                     <td data-title="Product Name">
                                         <em>{{{trans('lang.sales_tax')}}}</em>
-                                        <span>{{ $symbol }}{{{$invoice_info->sales_tax}}} {{ strtoupper($invoice_info->currency_code) }}</span>
+                                        <span>{{ $symbol }}{{{$invoice_info->sales_tax}}} {{ strtoupper($currency_code) }}</span>
                                     </td>
                                     <td data-title="Unit Price"></td>
                                     <td data-title="Total"></td>
@@ -126,7 +126,7 @@
                                 <tr>
                                     <td data-title="Product Name">
                                         <em>{{{trans('lang.net_amnt')}}}</em>
-                                        <span>{{ $symbol }}{{{$invoice_info->price}}} {{ strtoupper($invoice_info->currency_code) }}</span>
+                                        <span>{{ $symbol }}{{{$invoice_info->price}}} {{ strtoupper($currency_code) }}</span>
                                     </td>
                                     <td data-title="Unit Price"></td>
                                     <td data-title="Total"></td>

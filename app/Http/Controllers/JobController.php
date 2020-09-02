@@ -320,73 +320,117 @@ class JobController extends Controller
             $json['type'] = 'job_warning';
             return $json;
         }
-        $this->validate(
-            $request,
-            [
-                'title' => 'required',
-                'project_levels'    => 'required',
-                'job_duration'    => 'required',
-                'freelancer_type'    => 'required',
-                'english_level'    => 'required',
-                'project_cost'    => 'required',
-                'description'    => 'required',
-            ]
-        );
-        if (Schema::hasColumn('jobs', 'expiry_date')) {
-            if ($request['expiry_date'] == trans('lang.project_expiry')) {
-                $json['type'] = 'error';
-                $json['message'] = trans('lang.job_expiry_req');
-                return $json;
-            }
-            $expiry = Carbon::parse($request['expiry_date']);
-            if ($expiry->lessThan(Carbon::now())) {
-                $json['type'] = 'error';
-                $json['message'] = trans('lang.past_expiry_date');
-                return $json;
-            }
-            $this->validate($request, ['expiry_date' => 'required']);
-        }
-        if (!empty($request['latitude']) || !empty($request['longitude'])) {
+        if (Auth::user()->user_verified == 1) {
             $this->validate(
                 $request,
                 [
-                    'latitude' => ['regex:/^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}$/'],
-                    'longitude' => ['regex:/^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,6}$/'],
+                    'title' => 'required',
+                    'project_levels'    => 'required',
+                    'job_duration'    => 'required',
+                    'freelancer_type'    => 'required',
+                    'english_level'    => 'required',
+                    'project_cost'    => 'required',
+                    'description'    => 'required',
                 ]
             );
-        }
-        $package_item = Item::where('subscriber', Auth::user()->id)->first();
-        $package = !empty($package_item) ? Package::find($package_item->product_id) : '';
-        $option = !empty($package) ? unserialize($package->options) : '';
-        $expiry = !empty($option) ? $package_item->created_at->addDays($option['duration']) : '';
-        $expiry_date = !empty($expiry) ? Carbon::parse($expiry)->format('Y-m-d') : '';
-        $current_date = Carbon::now()->format('Y-m-d');
-        $posted_jobs = $this->job::where('user_id', Auth::user()->id)->count();
-        $posted_featured_jobs = Job::where('user_id', Auth::user()->id)->where('is_featured', 'true')->count();
-        $payment_settings = SiteManagement::getMetaValue('commision');
-        $package_status = '';
-        if (empty($payment_settings)) {
-            $package_status = 'true';
-        } else {
-            $package_status = !empty($payment_settings[0]['employer_package']) ? $payment_settings[0]['employer_package'] : 'true';
-        }
-        if ($package_status === 'true') {
-//            if ($current_date > $expiry_date) {
-//                $json['type'] = 'error';
-//                $json['message'] = trans('lang.need_to_purchase_pkg');
-//                return $json;
-//            }
-            if ($request['is_featured'] == 'true') {
-                if ($posted_featured_jobs >= intval($option['featured_jobs'])) {
+            if (Schema::hasColumn('jobs', 'expiry_date')) {
+                if ($request['expiry_date'] == trans('lang.project_expiry')) {
                     $json['type'] = 'error';
-                    $json['message'] = trans('lang.sorry_can_only_feature')  .' '. $option['featured_jobs'] .' ' . trans('lang.jobs_acc_to_pkg');
+                    $json['message'] = trans('lang.job_expiry_req');
                     return $json;
                 }
+                $expiry = Carbon::parse($request['expiry_date']);
+                if ($expiry->lessThan(Carbon::now())) {
+                    $json['type'] = 'error';
+                    $json['message'] = trans('lang.past_expiry_date');
+                    return $json;
+                }
+                $this->validate($request, ['expiry_date' => 'required']);
             }
-            if ($posted_jobs >= intval($option['jobs'])) {
-                $json['type'] = 'error';
-                $json['message'] = trans('lang.sorry_cannot_submit') .' '. $option['jobs'] .' ' . trans('lang.jobs_acc_to_pkg');
-                return $json;
+            if (!empty($request['latitude']) || !empty($request['longitude'])) {
+                $this->validate(
+                    $request,
+                    [
+                        'latitude' => ['regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
+                        'longitude' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/'],
+                    ]
+                );
+            }
+            $package_item = Item::where('subscriber', Auth::user()->id)->first();
+            $package = !empty($package_item) ? Package::find($package_item->product_id) : '';
+            $option = !empty($package) ? unserialize($package->options) : '';
+            $expiry = !empty($option) ? $package_item->created_at->addDays($option['duration']) : '';
+            $expiry_date = !empty($expiry) ? Carbon::parse($expiry)->format('Y-m-d') : '';
+            $current_date = Carbon::now()->format('Y-m-d');
+            $posted_jobs = $this->job::where('user_id', Auth::user()->id)->count();
+            $posted_featured_jobs = Job::where('user_id', Auth::user()->id)->where('is_featured', 'true')->count();
+            $payment_settings = SiteManagement::getMetaValue('commision');
+            $package_status = '';
+            if (empty($payment_settings)) {
+                $package_status = 'true';
+            } else {
+                $package_status = !empty($payment_settings[0]['employer_package']) ? $payment_settings[0]['employer_package'] : 'true';
+            }
+            if ($package_status === 'true') {
+                if ($current_date > $expiry_date) {
+                    $json['type'] = 'error';
+                    $json['message'] = trans('lang.need_to_purchase_pkg');
+                    return $json;
+                }
+                if ($request['is_featured'] == 'true') {
+                    if ($posted_featured_jobs >= intval($option['featured_jobs'])) {
+                        $json['type'] = 'error';
+                        $json['message'] = trans('lang.sorry_can_only_feature')  .' '. $option['featured_jobs'] .' ' . trans('lang.jobs_acc_to_pkg');
+                        return $json;
+                    }
+                }
+                if ($posted_jobs >= intval($option['jobs'])) {
+                    $json['type'] = 'error';
+                    $json['message'] = trans('lang.sorry_cannot_submit') .' '. $option['jobs'] .' ' . trans('lang.jobs_acc_to_pkg');
+                    return $json;
+                } else {
+                    $job_post = $this->job->storeJobs($request);
+                    if ($job_post = 'success') {
+                        $json['type'] = 'success';
+                        $json['message'] = trans('lang.job_post_success');
+                        // Send Email
+                        $user = User::find(Auth::user()->id);
+                        //send email to admin
+                        if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+                            $job = $this->job::where('user_id', Auth::user()->id)->latest()->first();
+                            $email_params = array();
+                            $new_posted_job_template = DB::table('email_types')->select('id')->where('email_type', 'admin_email_new_job_posted')->get()->first();
+                            $new_posted_job_template_employer = DB::table('email_types')->select('id')->where('email_type', 'employer_email_new_job_posted')->get()->first();
+                            if (!empty($new_posted_job_template->id) || !empty(new_posted_job_template_employer)) {
+                                $template_data = EmailTemplate::getEmailTemplateByID($new_posted_job_template->id);
+                                $template_data_employer = EmailTemplate::getEmailTemplateByID($new_posted_job_template_employer->id);
+                                $email_params['job_title'] = $job->title;
+                                $email_params['posted_job_link'] = url('/job/' . $job->slug);
+                                $email_params['name'] = Helper::getUserName(Auth::user()->id);
+                                $email_params['link'] = url('profile/' . $user->slug);
+                                Mail::to(config('mail.username'))
+                                ->send(
+                                    new AdminEmailMailable(
+                                        'admin_email_new_job_posted',
+                                        $template_data,
+                                        $email_params
+                                    )
+                                );
+                                if (!empty($user->email)) {
+                                    Mail::to($user->email)
+                                    ->send(
+                                        new EmployerEmailMailable(
+                                            'employer_email_new_job_posted',
+                                            $template_data_employer,
+                                            $email_params
+                                        )
+                                    );
+                                }
+                            }
+                        }
+                        return $json;
+                    }
+                }
             } else {
                 $job_post = $this->job->storeJobs($request);
                 if ($job_post = 'success') {
@@ -400,14 +444,14 @@ class JobController extends Controller
                         $email_params = array();
                         $new_posted_job_template = DB::table('email_types')->select('id')->where('email_type', 'admin_email_new_job_posted')->get()->first();
                         $new_posted_job_template_employer = DB::table('email_types')->select('id')->where('email_type', 'employer_email_new_job_posted')->get()->first();
-                        if (!empty($new_posted_job_template->id) || !empty(new_posted_job_template_employer)) {
+                        if (!empty($new_posted_job_template->id) || !empty($new_posted_job_template_employer)) {
                             $template_data = EmailTemplate::getEmailTemplateByID($new_posted_job_template->id);
                             $template_data_employer = EmailTemplate::getEmailTemplateByID($new_posted_job_template_employer->id);
                             $email_params['job_title'] = $job->title;
                             $email_params['posted_job_link'] = url('/job/' . $job->slug);
                             $email_params['name'] = Helper::getUserName(Auth::user()->id);
                             $email_params['link'] = url('profile/' . $user->slug);
-                            Mail::to(env('MAIL_FROM_ADDRESS'))
+                            Mail::to(config('mail.username'))
                             ->send(
                                 new AdminEmailMailable(
                                     'admin_email_new_job_posted',
@@ -431,47 +475,9 @@ class JobController extends Controller
                 }
             }
         } else {
-            $job_post = $this->job->storeJobs($request);
-            if ($job_post = 'success') {
-                $json['type'] = 'success';
-                $json['message'] = trans('lang.job_post_success');
-                // Send Email
-                $user = User::find(Auth::user()->id);
-                //send email to admin
-                if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
-                    $job = $this->job::where('user_id', Auth::user()->id)->latest()->first();
-                    $email_params = array();
-                    $new_posted_job_template = DB::table('email_types')->select('id')->where('email_type', 'admin_email_new_job_posted')->get()->first();
-                    $new_posted_job_template_employer = DB::table('email_types')->select('id')->where('email_type', 'employer_email_new_job_posted')->get()->first();
-                    if (!empty($new_posted_job_template->id) || !empty($new_posted_job_template_employer)) {
-                        $template_data = EmailTemplate::getEmailTemplateByID($new_posted_job_template->id);
-                        $template_data_employer = EmailTemplate::getEmailTemplateByID($new_posted_job_template_employer->id);
-                        $email_params['job_title'] = $job->title;
-                        $email_params['posted_job_link'] = url('/job/' . $job->slug);
-                        $email_params['name'] = Helper::getUserName(Auth::user()->id);
-                        $email_params['link'] = url('profile/' . $user->slug);
-                        Mail::to(env('MAIL_FROM_ADDRESS'))
-                        ->send(
-                            new AdminEmailMailable(
-                                'admin_email_new_job_posted',
-                                $template_data,
-                                $email_params
-                            )
-                        );
-                        if (!empty($user->email)) {
-                            Mail::to($user->email)
-                            ->send(
-                                new EmployerEmailMailable(
-                                    'employer_email_new_job_posted',
-                                    $template_data_employer,
-                                    $email_params
-                                )
-                            );
-                        }
-                    }
-                }
-                return $json;
-            }
+            $json['type'] = 'error';
+            $json['message'] = trans('lang.verify_accnt_post_job');
+            return $json;
         }
     }
 
@@ -518,8 +524,8 @@ class JobController extends Controller
             $this->validate(
                 $request,
                 [
-                    'latitude' => ['regex:/^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}$/'],
-                    'longitude' => ['regex:/^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,6}$/'],
+                    'latitude' => ['regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
+                    'longitude' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/'],
                 ]
             ); 
         }
@@ -814,8 +820,8 @@ class JobController extends Controller
         if (!empty($jobs)) {
             foreach ($jobs as $key => $job) {
                 if (Schema::hasColumn('jobs', 'expiry_date') && !empty($job->expiry_date)) {
-                    $expiry = Carbon\Carbon::parse($job->expiry_date);
-                    if (Carbon\Carbon::now()->lessThan($expiry)) {
+                    $expiry = Carbon::parse($job->expiry_date);
+                    if (Carbon::now()->lessThan($expiry)) {
                         // dd($job);
                         $user = User::find($job->user_id);
                         $latest_jobs[$key]['id'] = $job->id;

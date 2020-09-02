@@ -47,11 +47,11 @@ class LoginController extends Controller
     protected function authenticated(Request $request, $user)
     {
         if (Schema::hasTable('users')) {
-            if (!empty($user->verification_code)) {
-                Session::flash('error', trans('lang.verification_code_not_verified'));
-                Auth::logout();
-                return Redirect::to('/');
-            } else {
+            // if (!empty($user->verification_code)) {
+            //     Session::flash('error', trans('lang.verification_code_not_verified'));
+            //     Auth::logout();
+            //     return Redirect::to('/');
+            // } else {
                 $user_id = Auth::user()->id;
                 $user_role_type = User::getUserRoleType($user_id);
                 if (empty($user_role_type)) {
@@ -67,7 +67,7 @@ class LoginController extends Controller
                 } else {
                     return Redirect::to(url()->previous());
                 }
-            }
+            // }
         }
     }
 

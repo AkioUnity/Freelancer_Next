@@ -27,7 +27,7 @@
                 </div>
                 <div 
                     class="at-profile-setting__upload ios_img dc-settingscontent" 
-                    :id="'ios_img_wrapper'+currentElementID"
+                    :id="'ios_img_wrapper'+currentElementID" v-if="changeFound"
                 >
                     <page-media
                         :parent_id="'ios_img_wrapper'+currentElementID"
@@ -75,7 +75,7 @@
                 </div>
                 <div 
                     class="at-profile-setting__upload android_img dc-settingscontent" 
-                    :id="'android_img_wrapper'+currentElementID"
+                    :id="'android_img_wrapper'+currentElementID" v-if="changeFound"
                 >
                     <page-media
                         :parent_id="'android_img_wrapper'+currentElementID"
@@ -118,11 +118,9 @@
                         </ul>
                     </div>
                 </div>
-
-
                 <div 
                     class="at-profile-setting__upload app_img dc-settingscontent" 
-                    :id="'app_img_wrapper'+currentElementID"
+                    :id="'app_img_wrapper'+currentElementID" v-if="changeFound"
                 >
                     <page-media
                         :parent_id="'app_img_wrapper'+currentElementID"
@@ -167,8 +165,8 @@
                 </div>
                 <div 
                     class="at-profile-setting__upload bg_img dc-settingscontent" 
-                    :id="'bg_img_wrapper'+currentElementID"
-                    v-if="app.style == 'style2' || app.style == 'style3'"
+                    :id="'bg_img_wrapper'+currentElementID" 
+                    v-if="changeFound && (app.style == 'style2' || app.style == 'style3')"
                 >
                     <page-media
                         :parent_id="'bg_img_wrapper'+currentElementID"
@@ -302,6 +300,15 @@ export default {
             newAppImg:false,
             newIosImg:false,
             newAndroidImg:false,
+            changeFound:true
+        }
+    },
+    watch:{
+        currentElementID: function (change) {
+            this.changeFound = false
+            setTimeout(() => {
+                this.changeFound = true
+            }, 200);
         }
     },
     methods:{
@@ -353,7 +360,7 @@ export default {
             }, 130);
         },
         imageRemoved: function(imageType) {
-            if (this.cloneElement == false) {
+            // if (this.cloneElement == false) {
                 if (imageType == 'bgImg') {
                     if (this.app.background_image) {
                         this.app.background_image = null
@@ -362,8 +369,16 @@ export default {
                     if (this.app.app_image ) {
                         this.app.app_image = null
                     } 
+                } else if (imageType == 'iosImg') {
+                    if (this.app.ios_image ) {
+                        this.app.ios_image = null
+                    } 
+                } else if (imageType == 'androidImg') {
+                   if (this.app.android_image ) {
+                        this.app.android_image = null
+                    } 
                 }
-            }
+            // }
         },
         removeImage: function(imageType, hiddenID) {
             if (imageType == 'bgImg') {
@@ -373,6 +388,14 @@ export default {
             } else if (imageType == 'appImg') {
                 if (this.app.app_image ) {
                     this.app.app_image = null
+                } 
+            } else if (imageType == 'iosImg') {
+                if (this.app.ios_image ) {
+                    this.app.ios_image = null
+                } 
+            } else if (imageType == 'androidImg') {
+                if (this.app.android_image ) {
+                    this.app.android_image = null
                 } 
             }
             document.getElementById(hiddenID).remove()

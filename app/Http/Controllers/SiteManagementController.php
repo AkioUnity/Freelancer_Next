@@ -83,6 +83,7 @@ class SiteManagementController extends Controller
         $email = !empty($settings[0]['email']) ? $settings[0]['email'] : null;
         $connects_per_job = !empty($settings[0]['connects_per_job']) ? $settings[0]['connects_per_job'] : null;
         $gmap_api_key = !empty($settings[0]['gmap_api_key']) ? $settings[0]['gmap_api_key'] : null;
+        $price_range = !empty($settings[0]['price_range']) ? $settings[0]['price_range'] : null;
         $logo = !empty($settings[0]['logo']) ? $settings[0]['logo'] : null;
         $favicon = !empty($settings[0]['favicon']) ? $settings[0]['favicon'] : null;
         $payout_settings = $this->settings::getMetaValue('commision');
@@ -118,6 +119,8 @@ class SiteManagementController extends Controller
         $selected_language = !empty($settings[0]['language']) ? $settings[0]['language'] : '' ;
         $currency = array_pluck(Helper::currencyList(), 'code', 'code');
         $register_form = $this->settings::getMetaValue('reg_form_settings');
+        $selected_registration_type = !empty($register_form) && !empty($register_form[0]['registration_type']) ? $register_form[0]['registration_type'] : '';
+        $selected_verification_type = !empty($register_form) && !empty($register_form[0]['verification_type']) ? $register_form[0]['verification_type'] : 'admin_verify';
         $reg_one_title = !empty($register_form) && !empty($register_form[0]['step1-title']) ? $register_form[0]['step1-title'] : '';
         $reg_one_subtitle = !empty($register_form) && !empty($register_form[0]['step1-subtitle']) ? $register_form[0]['step1-subtitle'] : '';
         $reg_two_title = !empty($register_form) && !empty($register_form[0]['step2-title']) ? $register_form[0]['step2-title'] : '';
@@ -187,11 +190,13 @@ class SiteManagementController extends Controller
         $job_selected_header = !empty($inner_page) && !empty($inner_page[0]['job_header_style']) ? $inner_page[0]['job_header_style'] : 'style1';
         $service_selected_header = !empty($inner_page) && !empty($inner_page[0]['service_header_style']) ? $inner_page[0]['service_header_style'] : 'style1';
         $article_selected_header = !empty($inner_page) && !empty($inner_page[0]['article_header_style']) ? $inner_page[0]['article_header_style'] : 'style1';
+        $registration_type = Helper::getRegisterationTypes();
+        $verification_types = Helper::getVerificationTypes();
         if (file_exists(resource_path('views/extend/back-end/admin/settings/index.blade.php'))) {
             return view(
                 'extend.back-end.admin.settings.index',
                 compact(
-                    'f_logo', 'e_logo', 'job_logo', 'service_logo', 'article_logo',
+                    'selected_verification_type', 'verification_types', 'selected_registration_type', 'registration_type', 'f_logo', 'e_logo', 'job_logo', 'service_logo', 'article_logo', 'price_range',
                     'new_order_subject', 'new_order_content', 'employer_hiring_subject', 'employer_hiring_content',
                     'bank_bic_swift', 'bank_iban', 'bank_description', 'bank_instruction',
                     'account_name', 'account_number', 'bank_name', 'bank_routing_number',
@@ -223,7 +228,7 @@ class SiteManagementController extends Controller
             return view(
                 'back-end.admin.settings.index',
                 compact(
-                    'f_logo', 'e_logo', 'job_logo', 'service_logo', 'article_logo',
+                    'selected_verification_type', 'verification_types', 'selected_registration_type', 'registration_type', 'f_logo', 'e_logo', 'job_logo', 'service_logo', 'article_logo', 'price_range',
                     'new_order_subject', 'new_order_content', 'employer_hiring_subject', 'employer_hiring_content',
                     'bank_bic_swift', 'bank_iban', 'bank_description', 'bank_instruction',
                     'account_name', 'account_number', 'bank_name', 'bank_routing_number',
@@ -530,6 +535,11 @@ class SiteManagementController extends Controller
             $json['show_reg_form_banner'] = $reg_form_settings[0]['show_reg_form_banner'];
         } else {
             $json['show_reg_form_banner'] = 'true';
+        }
+        if (!empty($reg_form_settings[0]['registration_type'])) {
+            $json['registration_type'] = $reg_form_settings[0]['registration_type'];
+        } else {
+            $json['registration_type'] = 'multiple';
         }
         return $json;
     }
@@ -1383,6 +1393,25 @@ class SiteManagementController extends Controller
                 $json['chat_display'] = 'true';
             }
         }
+        if (!empty($settings[0]['enable_loader'])) {
+            if ($settings[0]['enable_loader'] == 'true') {
+                $json['enable_loader'] = 'true';
+            } else {
+                $json['enable_loader'] = 'false';
+            }
+        } else {
+            $json['enable_loader'] = 'true';
+        }
+        // Show Earnings
+        if (!empty($settings[0]['show_earnings'])) {
+            if ($settings[0]['show_earnings'] == 'true') {
+                $json['show_earnings'] = 'true';
+            } else {
+                $json['show_earnings'] = 'false';
+            }
+        } else {
+            $json['show_earnings'] = 'true';
+        }
         return $json;
     }
 
@@ -1394,6 +1423,7 @@ class SiteManagementController extends Controller
     public function importUpdate()
     {
         $json = array();
+        define('STDIN',fopen("php://stdin","r"));
         \Artisan::call('migrate');
         $json['type'] = 'success';
         return $json;
@@ -1641,5 +1671,62 @@ class SiteManagementController extends Controller
                 return $json;
             }
         }
+    }
+
+    /**
+     * Get Parent Menu List.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function getParentMenuList () {
+        $json = array();
+        $menu_settings = !empty(SiteManagement::getMetaValue('menu_settings')) ? SiteManagement::getMetaValue('menu_settings') : array();
+        $show_pages_list = array();
+        $count = 0;
+        if (!empty($menu_settings['custom_links'])) {
+            foreach ($menu_settings['custom_links'] as $key => $custom_menu) {
+                if ($custom_menu['relation_type'] == 'parent')    {
+                    $show_pages_list[$count] = $custom_menu;
+                    $count++;
+                }            
+            }
+        }
+        $json['type'] = 'success';
+        $json['parent_menus'] = $show_pages_list;
+        return $json;
+    }
+
+    /**
+     * Get Pages Order settings
+     *
+     * @access public
+     *
+     * @return View
+     */
+    public function getSavedMenusList()
+    {
+        $json = array();
+        // $pages_ids = DB::table('metas')->where('meta_key', 'page_order')->pluck('metable_id')->toArray();
+        // $pages_ids = array_values($pages_ids);
+        // $pages_list = Page::whereIn('id', $pages_ids)->get();
+        // $saved_pages_array = array();
+        // foreach ($pages_list as $key => $value) {
+        //     $saved_pages_array[$key]['id'] =  $value->id;
+        //     $saved_pages_array[$key]['title'] = $value->title; 
+        //     $saved_pages_array[$key]['type'] =  'pages';
+        //     $saved_pages_array[$key]['order'] =  $value->metaValue('page_order')['meta_value'];
+        // }
+        $menu_settings = !empty(SiteManagement::getMetaValue('menu_settings')) ? SiteManagement::getMetaValue('menu_settings') : array();
+        // dd($menu_settings['custom_links']);
+        // if (!empty($settings['pages'])) {
+        //     $merged_array = array_merge($saved_pages_array, $settings['pages']);
+        // } else {
+        //     $merged_array = $saved_pages_array;
+        // }
+        if (!empty($menu_settings['custom_links'])) {
+            $json['stored_menus'] = $menu_settings['custom_links'];
+        }
+        return $json;
     }
 }

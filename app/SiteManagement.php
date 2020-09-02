@@ -364,6 +364,9 @@ class SiteManagement extends Model
                 $settings_array[$key]['connects_per_job'] = $setting['connects_per_job'];
                 $settings_array[$key]['gmap_api_key'] = $setting['gmap_api_key'];
                 $settings_array[$key]['chat_display'] = $setting['chat_display'];
+                $settings_array[$key]['enable_loader'] = $setting['enable_loader'];
+                $settings_array[$key]['show_earnings'] = $setting['show_earnings'];
+                $settings_array[$key]['price_range'] = $setting['price_range'];
                 $settings_array[$key]['enable_theme_color'] = $setting['enable_theme_color'];
                 if (!empty($setting['header_style'])) {
                     $settings_array[$key]['header_style'] = $setting['header_style'];
@@ -980,18 +983,20 @@ class SiteManagement extends Model
                 $old_path = Helper::PublicPath() . '/uploads/settings/temp';
                 $new_path = Helper::PublicPath() . '/uploads/settings/home';
                 foreach ($register_setting as $key => $register) {
-                    $register_setting[$key]['step1-title'] = $register['step1-title'];
-                    $register_setting[$key]['step1-subtitle'] = $register['step1-subtitle'];
-                    $register_setting[$key]['step2-title'] = $register['step2-title'];
-                    $register_setting[$key]['step2-subtitle'] = $register['step2-subtitle'];
-                    $register_setting[$key]['step2-term-note'] = $register['step2-term-note'];
-                    $register_setting[$key]['step3-title'] = $register['step3-title'];
-                    $register_setting[$key]['step3-subtitle'] = $register['step3-subtitle'];
-                    $register_setting[$key]['step3-page'] = $register['step3-page'];
-                    $register_setting[$key]['step4-title'] = $register['step4-title'];
-                    $register_setting[$key]['step4-subtitle'] = $register['step4-subtitle'];
-                    $register_setting[$key]['show_emplyr_inn_sec'] = $register['show_emplyr_inn_sec'];
-                    $register_setting[$key]['show_reg_form_banner'] = $register['show_reg_form_banner'];
+                    $register_setting[$key]['step1-title'] = !empty($register['step1-title']) ? $register['step1-title'] : '';
+                    $register_setting[$key]['step1-subtitle'] = !empty($register['step1-subtitle']) ? $register['step1-subtitle'] : '';
+                    $register_setting[$key]['step2-title'] = !empty($register['step2-title']) ? $register['step2-title'] : '';
+                    $register_setting[$key]['step2-subtitle'] = !empty($register['step2-subtitle']) ? $register['step2-subtitle'] : '';
+                    $register_setting[$key]['step2-term-note'] = !empty($register['step2-term-note']) ? $register['step2-term-note'] : '';
+                    $register_setting[$key]['step3-title'] = !empty($register['step3-title']) ? $register['step3-title'] : '';
+                    $register_setting[$key]['step3-subtitle'] = !empty($register['step3-subtitle']) ? $register['step3-subtitle'] : '';
+                    $register_setting[$key]['step3-page'] = !empty($register['step3-page']) ? $register['step3-page'] : '';
+                    $register_setting[$key]['step4-title'] =!empty($register['step4-title']) ? $register['step4-title'] : '';
+                    $register_setting[$key]['step4-subtitle'] = !empty($register['step4-subtitle']) ? $register['step4-subtitle'] : '';
+                    $register_setting[$key]['show_emplyr_inn_sec'] = !empty($register['show_emplyr_inn_sec']) ? $register['show_emplyr_inn_sec'] : '';
+                    $register_setting[$key]['show_reg_form_banner'] = !empty($register['show_reg_form_banner']) ? $register['show_reg_form_banner'] : '';
+                    $register_setting[$key]['registration_type'] = !empty($register['registration_type']) ? $register['registration_type'] : '';
+                    $register_setting[$key]['verification_type'] = !empty($register['verification_type']) ? $register['verification_type'] : '';
                     if (!empty($register['register_image'])) {
                         if (file_exists($old_path . '/' . $register['register_image'])) {
                             if (!file_exists($new_path)) {
@@ -1236,7 +1241,9 @@ class SiteManagement extends Model
     public static function saveMenuSettings($menu_settings)
     {
         $menu_settings_array = array();
-        $count =0;
+        // dd($menu_settings);
+        $count = 0;
+        $custom_count = 0;
         if (!empty($menu_settings)) {
             $menu_settings_array['color'] = $menu_settings['color'];
             $menu_settings_array['menu_color'] = $menu_settings['menu_color'];
@@ -1247,6 +1254,12 @@ class SiteManagement extends Model
                     if ($value['type'] == 'innerPages') {
                         $menu_settings_array['pages'][$count] = $value;
                         $count++;
+                    } elseif ($value['type'] == 'custom_menu') {
+                        $checkLink = self::checkLinkExist(!empty($menu_settings['custom_links']) ? $menu_settings['custom_links'] : array(), $value['id']);
+                        if ($checkLink == true) {
+                            $menu_settings_array['pages'][$count] = $value;
+                            $count++;
+                        }
                     } elseif ($value['type'] == 'pages') {
                         $page = Page::findOrFail($value['id']);
                         $meta = new Meta();
@@ -1256,6 +1269,15 @@ class SiteManagement extends Model
                     }
                 }
             }
+            // Custom Link Start
+            if (!empty($menu_settings['custom_links'])) {
+                foreach ($menu_settings['custom_links'] as $custom_key => $custom_value) {
+                    $menu_settings_array['custom_links'][$custom_count] = $custom_value;
+                    $menu_settings_array['custom_links'][$custom_count]['relation_type'] = !empty($custom_value['parent_menu']) ? 'child' : 'parent';
+                    $custom_count++;
+                }
+            }
+            // Custom Link End
             $existing_data = SiteManagement::getMetaValue('menu_settings');
             if (!empty($existing_data)) {
                 DB::table('site_managements')->where('meta_key', '=', 'menu_settings')->delete();
@@ -1267,6 +1289,24 @@ class SiteManagement extends Model
                 ]
             );
             return 'success';
+        }
+    }
+
+    /**
+     * Get Page Footer
+     *
+     * @param int  $id   ID
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function checkLinkExist($custom_links, $id)
+    {
+        if (!empty($custom_links)) {
+            foreach($custom_links as $link) {
+                if ($link['custom_slug'] == $id) {
+                    return true;
+                }
+            }
         }
     }
 }

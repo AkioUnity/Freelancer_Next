@@ -96,6 +96,47 @@
                     </li>
                 @endif
             @endif
+            @php 
+                $order=''; $page_order=''; 
+                $custom_menus = !empty($menu_settings['custom_links']) ? $menu_settings['custom_links'] : '';
+                // dd($custom_menus);
+            @endphp
+            @if (!empty($custom_menus))
+                @foreach($custom_menus as $custom_key => $custom_value)
+                    @if ($custom_value['relation_type'] == 'parent')
+                        @php 
+                            $order = Helper::getCustomMenuPageOrder($custom_value['custom_slug']);
+                        @endphp
+                        <li style="{{!empty($order) ? 'order:'.$order : 'order:99' }}">
+                            <a href="{{ empty($custom_value['custom_link']) || $custom_value['custom_link'] == '#' ? 'javascript:void(0)' : $custom_value['custom_link'] }}">
+                                {{$custom_value['custom_title']}}
+                            </a>
+                            @php 
+                            $custom_menu_child = Helper::getCustomMenuChild($custom_value['custom_slug']);
+                            @endphp
+                            @if (!empty($custom_menu_child))
+                                <ul class="sub-menu">
+                                    @foreach($custom_menu_child as $custom_child)
+                                        @if (!empty($custom_child) && !empty($custom_child['type']) && $custom_child['type'] == 'custom_menu')
+                                            <li>
+                                                <a href="{{empty($custom_child['link']) || $custom_child['link'] == '#' ? 'javascript:void(0)' : $custom_child['link']}}">
+                                                    {{{$custom_child['title']}}}
+                                                </a>
+                                            </li>
+                                        @elseif (!empty($custom_child)) 
+                                            <li class="@if ($pageID == $custom_child['slug'] ) current-menu-item @endif">
+                                                <a href="{{url('page/'.$custom_child['slug'].'/')}}">
+                                                    {{{$custom_child['title']}}}
+                                                </a>
+                                            </li>
+                                        @endif
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </li>
+                    @endif
+                @endforeach
+            @endif
         </ul>
     </div>
 </nav>

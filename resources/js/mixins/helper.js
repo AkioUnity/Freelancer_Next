@@ -161,6 +161,7 @@ Vue.mixin({
         return list
       }
     },
+
     /*
     The function below returns
     Footer style list
@@ -181,6 +182,58 @@ Vue.mixin({
           'title': this.trans('lang.style03'),
           'value': 'style3',
           'img' : APP_URL+'/images/page-builder/footers/footer3.jpg'
+        },
+      }
+      if (key && (key in list)) {
+        return list[key]
+      } else {
+        return list
+      }
+    },
+
+    /*
+    The function below returns
+    Footer style list
+    */
+    getBackgroundTypes (key = '') {
+      let list = {
+        '1': {
+          'title': this.trans('lang.gradient'),
+          'value': 'gradient',
+        },
+        '2': {
+          'title': this.trans('lang.img'),
+          'value': 'img',
+        },
+      }
+      if (key && (key in list)) {
+        return list[key]
+      } else {
+        return list
+      }
+    },
+
+    /*
+    The function below returns
+    Footer style list
+    */
+    getGradientStyles (key = '') {
+      let list = {
+        '1': {
+          'title': this.trans('lang.to_top'),
+          'value': 'to top',
+        },
+        '2': {
+          'title': this.trans('lang.to_bottom'),
+          'value': 'to bottom',
+        },
+        '3': {
+          'title': this.trans('lang.to_left'),
+          'value': 'to left',
+        },
+        '4': {
+          'title': this.trans('lang.to_right'),
+          'value': 'to right',
         },
       }
       if (key && (key in list)) {

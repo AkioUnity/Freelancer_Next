@@ -17,7 +17,7 @@
                 <!-- Video Poster -->
                 <div 
                     class="at-profile-setting__upload video_poster dc-settingscontent" 
-                    :id="'video_poster_wrapper'+currentElementID"
+                    :id="'video_poster_wrapper'+currentElementID" v-if="changeFound"
                 >
                     <page-media
                         :parent_id="'video_poster_wrapper'+currentElementID"
@@ -146,7 +146,16 @@ export default {
         return {
             baseURL: APP_URL,
             tempUrl:APP_URL+'/uploads/pages/temp/',
-            newVideoImg:false
+            newVideoImg:false,
+            changeFound:true
+        }
+    },
+    watch:{
+        currentElementID: function (change) {
+            this.changeFound = false
+            setTimeout(() => {
+                this.changeFound = true
+            }, 200);
         }
     },
     methods:{
@@ -174,13 +183,13 @@ export default {
             }, 130);
         },
         imageRemoved: function(imageType) {
-            if (this.cloneElement == false) {
+            // if (this.cloneElement == false) {
                 if (imageType == 'video_poster') {
                     if (this.work_video.video_poster) {
                         this.work_video.video_poster = null
                     }
                 }
-            }
+            // }
         },
         removeImage: function(imageType, hiddenID) {
             if (imageType == 'video_poster') {

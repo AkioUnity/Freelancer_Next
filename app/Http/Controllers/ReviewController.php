@@ -81,7 +81,7 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
     {
-//        $server_verification = Helper::amglyIsDemoSite();
+        $server_verification = Helper::amglyIsDemoSite();
         if (!empty($server_verification)) {
             Session::flash('error', $server_verification);
             return Redirect::back();
@@ -108,7 +108,7 @@ class ReviewController extends Controller
     public function edit($id)
     {
         if (!empty($id)) {
-//            $review_options = $this->review_options::find($id);
+            $review_options = $this->review_options::find($id);
             if (!empty($review_options)) {
                 if (file_exists(resource_path('views/extend/back-end/admin/review-options/edit.blade.php'))) {
                     return View::make(
@@ -145,8 +145,8 @@ class ReviewController extends Controller
             'review_option_title' => 'required',
             ]
         );
-//        $this->review_options->updateReviewOptions($request, $id);
-//        Session::flash('message', trans('lang.review_option_updated'));
+        $this->review_options->updateReviewOptions($request, $id);
+        Session::flash('message', trans('lang.review_option_updated'));
         return Redirect::to('admin/review-options');
     }
 

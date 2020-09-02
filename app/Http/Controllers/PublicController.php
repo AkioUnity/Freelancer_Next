@@ -187,6 +187,31 @@ class PublicController extends Controller
     }
 
     /**
+     * Single Form validation
+     *
+     * @param \Illuminate\Http\Request $request request attributes
+     *
+     * @access public
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function singleFormValidation(Request $request)
+    {
+        $this->validate(
+            $request,
+            [
+                'first_name' => 'required',
+                'last_name' => 'required',
+                'email' => 'required|email|unique:users',
+                'password' => 'required|string|min:6|confirmed',
+                'password_confirmation' => 'required',
+                'termsconditions' => 'required',
+                'role' => 'not_in:admin',
+            ]
+        );
+    }
+
+    /**
      * Set slug before saving in DB
      *
      * @param \Illuminate\Http\Request $request request attributes
@@ -235,7 +260,7 @@ class PublicController extends Controller
                             $email_params['name'] = Helper::getUserName($id);
                             $email_params['email'] = $email;
                             $email_params['link'] = url('profile/' . $user->slug);
-                            Mail::to(env('MAIL_FROM_ADDRESS'))
+                            Mail::to(config('mail.username'))
                                 ->send(
                                     new AdminEmailMailable(
                                         'admin_email_registration',
@@ -355,19 +380,21 @@ class PublicController extends Controller
                 $badge_img  = !empty($badge) ? $badge->image : '';
                 $amount = Payout::where('user_id', $user->id)->select('amount')->pluck('amount')->first();
                 $employer_projects = Auth::user() ? Helper::getEmployerJobs(Auth::user()->id) : array();
+                $payment_settings = SiteManagement::getMetaValue('commision');
                 $currency_symbol  = !empty($payment_settings) && !empty($payment_settings[0]['currency']) ? Helper::currencyList($payment_settings[0]['currency']) : array();
                 $symbol = !empty($currency_symbol['symbol']) ? $currency_symbol['symbol'] : '$';
                 $settings = !empty(SiteManagement::getMetaValue('settings')) ? SiteManagement::getMetaValue('settings') : array();
                 $display_chat = !empty($settings[0]['chat_display']) ? $settings[0]['chat_display'] : false;
-                $payment_settings = SiteManagement::getMetaValue('commision');
                 $enable_package = !empty($payment_settings) && !empty($payment_settings[0]['enable_packages']) ? $payment_settings[0]['enable_packages'] : 'true';
                 $videos = !empty($profile->videos) ? Helper::getUnserializeData($profile->videos) : '';
                 $feedbacks = Review::select('feedback')->where('receiver_id', $user->id)->count(); 
                 $average_rating_count = !empty($feedbacks) ? $reviews->sum('avg_rating')/$feedbacks : 0;
+                $show_earnings = !empty($settings) && !empty($settings[0]['show_earnings']) ? $settings[0]['show_earnings'] : true;
                 if (file_exists(resource_path('views/extend/front-end/users/freelancer-show.blade.php'))) {
                     return View(
                         'extend.front-end.users.freelancer-show',
                         compact(
+                            'show_earnings',
                             'average_rating_count',
                             'videos',
                             'services',
@@ -408,6 +435,7 @@ class PublicController extends Controller
                     return View(
                         'front-end.users.freelancer-show',
                         compact(
+                            'show_earnings',
                             'average_rating_count',
                             'videos',
                             'services',
@@ -950,7 +978,6 @@ class PublicController extends Controller
      */
     public function resetPasswordView($verification_code)
     {
-        dd($verification_code);
         if (!empty($verification_code)) {
             session()->put(['verification_code' => $verification_code]);
             if (file_exists(resource_path('views/extend/front-end/reset-password.blade.php'))) {
@@ -1191,5 +1218,19 @@ class PublicController extends Controller
             $json['type'] = 'error';
             return $json;
         }
+    }
+
+    /**
+     * Get filter Options.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getPriceLimit()
+    {
+        $json = array();
+        
+        $general_settings = !empty(SiteManagement::getMetaValue('settings')) ? SiteManagement::getMetaValue('settings') : array();
+		$price_range = !empty($general_settings) && !empty($general_settings[0]['price_range']) ? $general_settings[0]['price_range'] : 1000;
+        return $price_range;
     }
 }

@@ -13,7 +13,7 @@
                 </div>
                 <div 
                     class="at-profile-setting__upload bg_img dc-settingscontent" 
-                    :id="'bg_img_wrapper'+currentElementID"
+                    :id="'bg_img_wrapper'+currentElementID" v-if="changeFound"
                 >
                     <page-media
                         :parent_id="'bg_img_wrapper'+currentElementID"
@@ -139,7 +139,16 @@ export default {
         return {
             baseURL: APP_URL,
             tempUrl:APP_URL+'/uploads/pages/temp/',
-            newBgImg: false
+            newBgImg: false,
+            changeFound:true
+        }
+    },
+    watch:{
+        currentElementID: function (change) {
+            this.changeFound = false
+            setTimeout(() => {
+                this.changeFound = true
+            }, 200);
         }
     },
     methods:{
@@ -167,13 +176,13 @@ export default {
             }, 130);
         },
         imageRemoved: function(imageType) {
-            if (this.cloneElement == false) {
+            // if (this.cloneElement == false) {
                 if (imageType == 'bgImg') {
                     if (this.freelancer.backgroundImg) {
                         this.freelancer.backgroundImg = null
                     }
                 }
-            }
+            // }
         },
         removeImage: function(imageType, hiddenID) {
             if (imageType == 'bgImg') {

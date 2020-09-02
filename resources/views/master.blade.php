@@ -31,9 +31,12 @@
 	<link href="{{ asset('css/linearicons.css') }}" rel="stylesheet">
 	@stack('sliderStyle')
 	<link href="{{ asset('css/main.css') }}" rel="stylesheet">
-	<link href="{{ asset('css/custom.css?v2') }}" rel="stylesheet">
+	<link href="{{ asset('css/custom.css') }}" rel="stylesheet">
+	@if(Helper::getTextDirection() == 'rtl')
+		<link href="{{ asset('css/rtl.css') }}" rel="stylesheet">
+	@endif
 	<link href="{{ asset('css/responsive.css') }}" rel="stylesheet">
-	<link href="{{ asset('css/rtl.css') }}" rel="stylesheet">
+
 	<link href="{{ asset('css/color.css') }}" rel="stylesheet">
 	<link href="{{ asset('css/maintwo.css') }}" rel="stylesheet">
 	@php echo \App\Typo::setSiteStyling(); @endphp
@@ -80,11 +83,17 @@
 	<!--[if lt IE 8]>
 		<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 	<![endif]-->
-	<div class="preloader-outer">
-		<div class="preloader-holder">
-			<div class="loader"></div>
+	@php
+		$general_settings = !empty(App\SiteManagement::getMetaValue('settings')) ? App\SiteManagement::getMetaValue('settings') : array();
+		$enable_loader = !empty($general_settings) && !empty($general_settings[0]['enable_loader']) ? $general_settings[0]['enable_loader'] : true;
+	@endphp
+	@if (!empty($enable_loader) && ($enable_loader === true || $enable_loader === 'true'))
+		<div class="preloader-outer">
+			<div class="preloader-holder">
+				<div class="loader"></div>
+			</div>
 		</div>
-	</div>
+	@endif
 	<div id="wt-wrapper" class="wt-wrapper wt-haslayout">
 		<div class="wt-contentwrapper">
 			@yield('header')

@@ -189,7 +189,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
         App\Providers\AmentotechServiceProvider::class,
-        Cartalyst\Stripe\Laravel\StripeServiceProvider::class,
+//        Cartalyst\Stripe\Laravel\StripeServiceProvider::class,
 
         /*
          * Role Permission Service Providers...

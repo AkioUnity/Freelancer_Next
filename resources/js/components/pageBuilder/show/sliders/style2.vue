@@ -54,6 +54,7 @@ export default {
         var slider = jQuery('.owl-carousel')
         slider.owlCarousel({
             items: 1,
+            rtl:true,
             animateOut: 'fadeOut',
             animateIn: 'fadeIn',
             loop:true,

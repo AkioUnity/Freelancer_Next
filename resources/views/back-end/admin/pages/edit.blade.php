@@ -39,3 +39,6 @@
         </section>
     </div>
 @endsection
+@push('scripts')
+    <script src="{{ asset('js/owl.carousel.min.js') }}"></script>
+@endpush

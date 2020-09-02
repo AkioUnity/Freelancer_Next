@@ -84,6 +84,8 @@
 	}
 	.la-ps-freelancer .wt-userform .wt-skills.la-skills-holder > div:nth-child(2) .wt-skillsform fieldset .form-group{padding-right:5px; }
 	.la-ps-freelancer .wt-userform .wt-skills.la-skills-holder > div:nth-child(2) .wt-skillsform .wt-btnarea.form-group{position: static;padding: 5px;}
+	.wt-header-color .la-color-picker{width: 50%;}
+	.wt-header-color .la-color-picker:nth-child(n+3){padding-top: 15px;}
 }
 @media (max-width:1400px){
 	table.wt-tablecategories tbody tr td{padding: 10px;}
@@ -590,6 +592,10 @@
 		padding: 0 0 20px 0;
 		border-bottom: 1px solid #ddd;
 	}
+	.wt-header-color .la-color-picker{width: 100%;}
+	.wt-header-color .la-color-picker ~ .la-color-picker {padding-top: 15px;}
+	.wt-userlistingvtwo .wt-userlistingcontent .wt-btnarea .wt-btn{width: 100%;}
+	.wt-userlistingvtwo .wt-userlistingcontent .wt-btnarea .wt-btn + .wt-btn{margin: 10px 0 0 0;}
 }
 @media (max-width:479px){
 	.wt-accordioninnertitle{padding: 10px;}
@@ -601,4 +607,8 @@
 	.wt-attachfile li em{float: left;width: 100%;}
 	.wt-historycontentcol .wt-historydescription{padding: 30px 10px;}
 	.wt-likeunlike span{display: block;margin-bottom:10px; }
+}
+@media (max-width:360px){
+	.wt-la-color-picker .verte__menu-origin {left: 0;}
+	.wt-settingscontent2 .verte__menu-origin{right: -30px;}
 }

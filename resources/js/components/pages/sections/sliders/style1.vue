@@ -14,7 +14,7 @@
                             <img 
                                 :src="tempUrl+slider.inner_banner_image" 
                                 alt="image"
-                                v-if="newInnerBannerImage"
+                                v-if="newInnerBannerImage && slider.inner_banner_image"
                             >
                             <img 
                                 :src="imageUrl+slider.inner_banner_image" 
@@ -26,7 +26,7 @@
                                 :src="tempUrl+slider.floating_image01" 
                                 alt="image"
                                 class="wt-bannermanimgone"
-                                v-if="newFloatingImg1"
+                                v-if="newFloatingImg1 && slider.floating_image01"
                             >
                             <img 
                                 :src="imageUrl+slider.floating_image01" 
@@ -39,7 +39,7 @@
                                 :src="tempUrl+slider.floating_image02" 
                                 alt="image"
                                 class="wt-bannermanimgtwo"
-                                v-if="newFloatingImg2"
+                                v-if="newFloatingImg2 && slider.floating_image02"
                             >
                             <img 
                                 :src="imageUrl+slider.floating_image02" 

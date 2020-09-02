@@ -19,21 +19,25 @@
     @if ($slider_style == 'style2' || $slider_style == 'style3')
         @section('homeSlider')
             <div id="slider">
-                @if ($slider_style == 'style2')
-                    <second-slider 
-                        :page_id="{{$page['id']}}">
-                    </second-slider>
-                @elseif ($slider_style == 'style3') 
-                    <third-slider 
+                <div v-if="sliderSkeleton">
+                    <slider-skeleton/>
+                </div>
+                <div v-else>
+                    @if ($slider_style == 'style2')
+                        <second-slider 
+                            :page_id="{{$page['id']}}">
+                        </second-slider>
+                        @elseif ($slider_style == 'style3') 
+                        <third-slider 
                         :page_id="{{$page['id']}}">
                     </third-slider>
-                @endif
+                    @endif
+                </div>
             </div>
         @endsection
     @endif
 @endif
 @section('content')
-    <!--show.blade.php content-->
     @if ($home == false)
         @php $breadcrumbs = Breadcrumbs::generate('showPage',$page, $slug); @endphp
         @if (file_exists(resource_path('views/extend/front-end/includes/inner-banner.blade.php')))
@@ -64,17 +68,16 @@
         @endif
         @if (!empty($page))
             @if (!empty($sections))
-                <!--<![show-new-page ]-->
                 <show-new-page 
                 :page_id="'{{$page['id']}}'" 
                 :access_type="'{{$type}}'"
                 :symbol="'{{ !empty($symbol['symbol']) ? $symbol['symbol'] : '$' }}'"
                 :auth_role="'{{Auth::user() ? Auth::user()->getRoleNames()[0] : 'false'}}'"
+                :slider_style= "'{{$slider_style}}'"
                 >
                 </show-new-page>
             @endif
             @if (!empty($description && $description != 'null'))
-                <!--$description-->
                 <div class="dc-contentwrappers">
                     <div class="container">
                         <div class="row">

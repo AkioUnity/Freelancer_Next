@@ -1,5 +1,5 @@
 <aside id="wt-sidebar" class="wt-sidebar wt-usersidebar">
-    {!! Form::open(['url' => url('search-results'), 'method' => 'get', 'class' => 'wt-formtheme wt-formsearch']) !!}
+    {!! Form::open(['url' => url('search-results'), 'method' => 'get', 'class' => 'wt-formtheme wt-formsearch', 'id' => 'wt-formsearch']) !!}
         <input type="hidden" value="{{$type}}" name="type">
         <div class="wt-widget wt-effectiveholder wt-startsearch">
             <div class="wt-widgettitle">

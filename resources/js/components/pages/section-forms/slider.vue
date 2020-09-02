@@ -393,7 +393,7 @@ export default {
             }
         },
         imageRemoved: function(imageType) {
-            if (this.cloneElement == false) {
+            // if (this.cloneElement == false) {
                 if (imageType == 'floatingImage01') {
                     if (this.slider.floating_image01) {
                         this.slider.floating_image01 = null
@@ -407,7 +407,7 @@ export default {
                         this.slider.inner_banner_image = null
                     } 
                 }
-            }
+            // }
         },
         removeImage: function(imageType, hiddenID) {
             if (imageType == 'floatingImage01') {

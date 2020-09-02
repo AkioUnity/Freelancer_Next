@@ -131,6 +131,7 @@
         _wt_freelancerslider.owlCarousel({
             items: 1,
             loop:true,
+            rtl:true,
             nav:true,
             margin: 0,
             autoplay:false,

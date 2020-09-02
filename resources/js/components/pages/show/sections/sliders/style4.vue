@@ -32,7 +32,7 @@
             </div>
         </div>
         <div id="particles-js" class="wt-particles particles-js"></div>
-        <carousel 
+        <!-- <carousel 
             id="wt-home-slider" 
             class="wt-home-slider"
             :items='1'
@@ -43,7 +43,8 @@
             :dots='false'
             :margin='0'
             :autoplay='true'
-        >
+        > -->
+        <div id="wt-home-slider" class="wt-home-slider owl-carousel owl-loaded owl-drag">
             <figure class="item" v-for="(slide, index) in slider.slider_image" :key="index">
                 <img 
                     :src="imageUrl+slide" 
@@ -51,7 +52,8 @@
                     v-if="page_id"
                 />
             </figure>
-        </carousel>
+        </div>
+        <!-- </carousel> -->
     </div>
 </template>
 <script>
@@ -71,11 +73,22 @@ export default {
         setTimeout(function(){ 
             self.intParticles()
         }, 3000);
+        var wt_home_slider = jQuery("#wt-home-slider")
+        wt_home_slider.owlCarousel({
+            items: 1,
+            loop:true,
+            nav:false,
+            margin: 0,
+            rtl:true,
+            autoplay:true,
+            animateOut: 'fadeOut',
+            animateIn: 'fadeIn'
+        });
+      
     },
     methods:{
         intParticles() {
             var particle1 = document.getElementById('particles-js')
-            // console.log(particle1)
             if (particle1 !== null) {
                 particlesJS("particles-js",{
                     "particles": {

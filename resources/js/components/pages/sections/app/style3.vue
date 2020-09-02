@@ -29,7 +29,7 @@
                                 <img 
                                     :src="tempUrl+app.ios_image" 
                                     alt="image"
-                                    v-if="newIosImg"
+                                    v-if="newIosImg && app.ios_image"
                                 />
                                 <img 
                                     :src="imageUrl+app.ios_image" 
@@ -41,7 +41,7 @@
                                 <img 
                                     :src="tempUrl+app.android_image" 
                                     alt="image"
-                                    v-if="newAndroidImg"
+                                    v-if="newAndroidImg && app.android_image"
                                 />
                                 <img 
                                     :src="imageUrl+app.android_image" 

@@ -71,19 +71,21 @@
 													</span>
 												</td>
 												<td>
-													<span class="bt-content">
-														<div class="wt-service-tabel">
-															<figure class="service-feature-image"><img src="{{{asset(Helper::getProfileImage($user->id))}}}" alt="{{{trans('lang.image')}}}"></figure>
-															<div class="wt-freelancers-content">
-																<div class="dc-title">
-																	@if ($user->user_verified == 1)
-																		<span class="wt-featuredtagvtwo">{{ trans('lang.featured') }}</span>
-																	@endif
-																	<a href="{{{url('profile/'.$user->slug)}}}"><h3>{{{Helper::getUserName($user->id)}}}</h3></a>
+													@if (!empty($user))
+														<span class="bt-content">
+															<div class="wt-service-tabel">
+																<figure class="service-feature-image"><img src="{{{asset(Helper::getProfileImage($user->id))}}}" alt="{{{trans('lang.image')}}}"></figure>
+																<div class="wt-freelancers-content">
+																	<div class="dc-title">
+																		@if ($user->user_verified == 1)
+																			<span class="wt-featuredtagvtwo">{{ trans('lang.featured') }}</span>
+																		@endif
+																		<a href="{{{url('profile/'.$user->slug)}}}"><h3>{{{Helper::getUserName($user->id)}}}</h3></a>
+																	</div>
 																</div>
 															</div>
-														</div>
-													</span>
+														</span>
+													@endif
 												</td>
 												<td>
 													<span class="bt-content wt-payment-tab">

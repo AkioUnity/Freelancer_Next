@@ -26,9 +26,16 @@
                         <p>{{ trans('lang.show_search_form') }}</p>
                     </div>
                 </div>
+                <div class="form-group">
+                    <div class="amt-select">
+                        <select class="form-control" v-model="banner.backgroundType"> 
+                        <option v-for="(type, index) in getBackgroundTypes()" :key="index" :value="type.value">{{type.title}}</option>
+                        </select>
+                    </div>
+                </div>
                 <div 
                     class="at-profile-setting__upload front_img dc-settingscontent" 
-                    :id="'front_img_wrapper'+currentElementID"
+                    :id="'front_img_wrapper'+currentElementID"  v-if="changeFound"
                 >
                     <page-media
                         :parent_id="'front_img_wrapper'+currentElementID"
@@ -73,7 +80,7 @@
                 </div>
                 <div 
                     class="at-profile-setting__upload bg_img dc-settingscontent" 
-                    :id="'bg_img_wrapper'+currentElementID"
+                    :id="'bg_img_wrapper'+currentElementID"  v-if="changeFound"
                 >
                     <page-media
                         :parent_id="'bg_img_wrapper'+currentElementID"
@@ -117,6 +124,24 @@
                     </div>
                 </div>
             </fieldset>
+        </div>
+        <div class="amt-dhb-main_content" v-if="banner.backgroundType =='gradient'">
+            <div class="amt-dhb-heading"><h3>{{ trans('lang.background_gradient') }}</h3></div>
+        </div>
+        <div class="form-group" v-if="banner.backgroundType =='gradient'">
+            <div class="amt-select">
+                <select class="form-control" v-model="banner.gradientStyle"> 
+                    <option v-for="(style, index) in getGradientStyles()" :key="index" :value="style.value">{{style.title}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="amt-element-title amt-element-titlecontent" v-if="banner.backgroundType =='gradient'">
+            <h6>{{ trans('lang.gradient_one') }}</h6>
+            <verte menuPosition="right" model="hex" v-model="banner.gradient1"></verte>
+        </div>
+        <div class="amt-element-title amt-element-titlecontent" v-if="banner.backgroundType =='gradient'">
+            <h6>{{ trans('lang.gradient_two') }}</h6>
+            <verte menuPosition="right" model="hex" v-model="banner.gradient2"></verte>
         </div>
         <div class="amt-dhb-main_content">
             <div class="amt-dhb-heading"><h3>{{ trans('lang.style') }}</h3></div>
@@ -204,7 +229,16 @@ export default {
             baseURL: APP_URL,
             tempUrl:APP_URL+'/uploads/pages/temp/',
             newBgImg: false,
-            newFrontImg: false
+            newFrontImg: false,
+            changeFound:true
+        }
+    },
+    watch:{
+        currentElementID: function (change) {
+            this.changeFound = false
+            setTimeout(() => {
+                this.changeFound = true
+            }, 200);
         }
     },
     methods:{
@@ -240,7 +274,7 @@ export default {
             }, 130);
         },
         imageRemoved: function(imageType) {
-            if (this.cloneElement == false) {
+            // if (this.cloneElement == false) {
                 if (imageType == 'bgImg') {
                     if (this.banner.backgroundImg) {
                         this.banner.backgroundImg = null
@@ -250,7 +284,7 @@ export default {
                         this.banner.frontImg = null
                     } 
                 }
-            }
+            // }
         },
         removeImage: function(imageType, hiddenID) {
             if (imageType == 'bgImg') {

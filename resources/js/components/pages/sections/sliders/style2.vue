@@ -40,7 +40,7 @@
                 </div>
             </div>
         </div>
-        <carousel 
+        <!-- <carousel 
             id="wt-bgworkslider" 
             class="wt-bgworkslider"
             :items='1'
@@ -52,23 +52,25 @@
             :margin='0'
             :autoplay='true'
             v-if="newSliderImage || page_id"
-        >
-            <div class="item" v-for="(slide, index) in slider.slider_image" :key="index">
-                <figure>
-                    <!-- Slider Images-->
-                    <img 
-                        :src="tempUrl+slide" 
-                        alt="image"
-                        v-if="newSliderImage"
-                    >
-                    <img 
-                        :src="imageUrl+slide" 
-                        alt="img description" 
-                        v-else-if="pageID"
-                    />
-                </figure>
+        > -->
+            <div id="wt-bgworkslider" class="wt-bgworkslider owl-carousel"  v-if="newSliderImage || page_id">
+                <div class="item" v-for="(slide, index) in slider.slider_image" :key="index">
+                    <figure>
+                        <!-- Slider Images-->
+                        <img 
+                            :src="tempUrl+slide" 
+                            alt="image"
+                            v-if="newSliderImage"
+                        >
+                        <img 
+                            :src="imageUrl+slide" 
+                            alt="img description" 
+                            v-else-if="pageID"
+                        />
+                    </figure>
+                </div>
             </div>
-        </carousel>
+        <!-- </carousel> -->
     </section>
 </template>
 <script>
@@ -106,8 +108,31 @@ export default {
             setTimeout(function(){ 
                 self.newSliderImage = true
             }, 10)
-            
         })
+        var slider = jQuery('.wt-bgworkslider')
+        slider.owlCarousel({
+            items: 1,
+            rtl:true,
+            animateOut: 'fadeOut',
+            animateIn: 'fadeIn',
+            loop:true,
+            nav:false,
+            margin: 0,
+            autoplay:true,
+        });
     },
+    updated () {
+        var slider = jQuery('.wt-bgworkslider')
+        slider.owlCarousel({
+            items: 1,
+            rtl:true,
+            animateOut: 'fadeOut',
+            animateIn: 'fadeIn',
+            loop:true,
+            nav:false,
+            margin: 0,
+            autoplay:true,
+        });
+    }
 };
 </script>
