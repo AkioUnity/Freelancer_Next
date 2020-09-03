@@ -17,9 +17,21 @@ GET https://ineedadeveloper.com/api/v1/listing/add-jobs
 Accept: application/json
 ###
 
-POST https://ineedadeveloper.com/api/v1/listing/add-jobs
-Content-Type: application/x-www-form-urlencoded
+POST https://www.ineedadeveloper.com/register
+Content-Type: application/json
 
-id=999&value=content
+{
+first_name: cccc,
+last_name: ddddddd,
+email: amgunity@gmail.com,
+locations: 237,
+password: djwth10,
+password_confirmation: djwth10,
+role: employer,
+employees: 10,
+department: 4,
+department_name:"d_name",
+termsconditions: on,
+}
 
 ###

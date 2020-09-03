@@ -84,8 +84,8 @@ return [
     |
     */
 
-    'username' => env('MAIL_USERNAME'),
-
+    'from_address' => env('MAIL_FROM_ADDRESS'),
+    'username' => 'apikey',
     'password' => env('MAIL_PASSWORD'),
 
     /*

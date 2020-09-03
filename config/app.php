@@ -1,6 +1,10 @@
 <?php
 
+//print_r($_SERVER);
+
 $local_debug=(isset($_SERVER['SERVER_NAME']) && strpos($_SERVER['SERVER_NAME'], 'an'))?true:false;
+if (isset($_SERVER['HTTP_INCAP_CLIENT_IP']) && $_SERVER['HTTP_INCAP_CLIENT_IP']=='183.182.110.40')
+    $local_debug=true;
 
 return [
 
@@ -13,7 +17,7 @@ return [
     |
     */
 
-    'version' => 'v2.3',
+    'version' => 'v2.6',
 
     /*
     |--------------------------------------------------------------------------

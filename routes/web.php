@@ -93,7 +93,7 @@ Route::get('test_an', 'PublicController@test')->name('test_an');
 Route::group(
     ['middleware' => ['role:admin']],
     function () {
-
+        Route::post('admin/update/user-verify', 'UserController@updateUserVerification');
         // Exam Routes
 
         Route::delete('delete/sheet/quiz/{id}','TopicController@deleteperquizsheet')->name('del.per.quiz.sheet');

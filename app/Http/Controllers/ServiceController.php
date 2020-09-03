@@ -247,7 +247,7 @@ class ServiceController extends Controller
                             $email_params['name'] = Helper::getUserName(Auth::user()->id);
                             $email_params['link'] = url('profile/' . $user->slug);
                             $template_data = Helper::getAdminServicePostedEmailContent();
-                            Mail::to(config('mail.username'))
+                            Mail::to(config('mail.from_address'))
                                 ->send(
                                     new AdminEmailMailable(
                                         'admin_email_new_service_posted',
@@ -288,7 +288,7 @@ class ServiceController extends Controller
                         $email_params['name'] = Helper::getUserName(Auth::user()->id);
                         $email_params['link'] = url('profile/' . $user->slug);
                         $template_data = Helper::getAdminServicePostedEmailContent();
-                        Mail::to(config('mail.username'))
+                        Mail::to(config('mail.from_address'))
                             ->send(
                                 new AdminEmailMailable(
                                     'admin_email_new_service_posted',

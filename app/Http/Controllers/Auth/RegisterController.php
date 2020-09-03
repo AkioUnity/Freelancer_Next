@@ -181,7 +181,7 @@ class RegisterController extends Controller
                     $email_params['name'] = Helper::getUserName($user->id);
                     $email_params['email'] = $user->email;
                     $email_params['link'] = url('profile/' . $user->slug);
-                    Mail::to(config('mail.username'))
+                    Mail::to(config('mail.from_address'))
                         ->send(
                             new AdminEmailMailable(
                                 'admin_email_registration',
